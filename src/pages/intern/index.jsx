@@ -203,36 +203,8 @@ export function InternDashboard() {
 
       <div className="grid-2 mb-24">
         <WeeklyHoursCard tasks={nonLeaveTasks} noTarget/>
-        <div className="card">
-          <div className="card-header"><div className="card-title">📊 Breakdown</div></div>
-          <div className="card-body">
-            {[["Done",done,"#16a34a"],["In Progress",inProgress,"#1d4ed8"],["To Do",todo,"#6b7280"],["Hold",hold,"#d97706"]].map(([l,v,c]) => (
-              <div key={l} className="flex items-center gap-10 mb-16">
-                <div style={{ width:10, height:10, borderRadius:"50%", background:c, flexShrink:0 }}/>
-                <div style={{ flex:1, fontSize:13 }}>{l}</div>
-                <div style={{ fontSize:13, fontWeight:700, minWidth:24, textAlign:"right" }}>{v}</div>
-                <div style={{ width:90, height:6, background:"var(--gray-100)", borderRadius:3, overflow:"hidden" }}>
-                  <div style={{ height:"100%", width: total ? (v/total*100)+"%" : "0%", background:c, borderRadius:3 }}/>
-                </div>
-              </div>
-            ))}
-            {leaveDays.length > 0 && (
-              <div style={{ borderTop:"1px solid #f1f5f9", paddingTop:12, marginTop:4 }}>
-                <div className="flex items-center gap-10">
-                  <div style={{ width:10, height:10, borderRadius:"50%", background:"#f59e0b", flexShrink:0 }}/>
-                  <div style={{ flex:1, fontSize:13 }}>Leave Days</div>
-                  <div style={{ fontSize:13, fontWeight:700 }}>{leaveDays.length}</div>
-                </div>
-              </div>
-            )}
-            <div style={{ borderTop:"1px solid #f1f5f9", paddingTop:14, marginTop:10 }}>
-              <div style={{ display:"flex", justifyContent:"space-between", fontSize:13 }}>
-                <span style={{ color:"#6b7280" }}>All-time logged</span>
-                <span style={{ fontWeight:800, color:"#0a2e1a", fontFamily:"Syne,sans-serif" }}>{formatMinutes(totalMins)}</span>
-              </div>
-            </div>
-          </div>
-        </div>
+      
+       
       </div>
 
       {leaveDays.filter(t => { const d=new Date(t.date); return d>=mon&&d<=sun; }).length > 0 && (
