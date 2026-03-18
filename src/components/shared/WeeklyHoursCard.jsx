@@ -1,4 +1,3 @@
-
 import { formatMinutes } from "../../utils/helpers";
 
 const TARGET = 30 * 60;
@@ -103,7 +102,7 @@ export default function WeeklyHoursCard({ tasks = [], weekMins: propMins, noTarg
           {[
             ["Mon–Sun", formatMinutes(weekMins), color],
             ...(noTarget ? [] : [["Target", "30h", "#6b7280"]]),
-            ["Daily ~", "6h", "#6b7280"],
+            ["Daily ~", "8h", "#6b7280"],
           ].map(([l, v, c]) => (
             <div key={l} style={{ background:"#f8fafc", borderRadius:10, padding:"10px 6px" }}>
               <div style={{ fontFamily:"Syne,sans-serif", fontWeight:800, fontSize:17, color:c }}>{v}</div>
