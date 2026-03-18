@@ -1,14 +1,14 @@
-
 export const todayISO = () => new Date().toISOString().split("T")[0];
 
-export const formatMinutes = (mins) => {
-  if (!mins) return "0h";
-  const h = Math.floor(mins / 60);
-  const m = mins % 60;
-  if (h === 0) return `0h`;               
-  if (m === 0) return `${h}h`;
 
-  return m >= 30 ? `${h + 1}h` : `${h}h`;
+export const formatMinutes = (mins) => {
+  const n = parseInt(mins) || 0;
+  if (n <= 0) return "0m";
+  const h = Math.floor(n / 60);
+  const m = n % 60;
+  if (h === 0) return `${m}m`;
+  if (m === 0) return `${h}h`;
+  return `${h}h ${m}m`;
 };
 
 export const computeStats = (tasks = []) => ({

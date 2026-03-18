@@ -25,11 +25,9 @@ export default function TaskModal({ task, currentUser = {}, onClose, onSave, loa
                           : "",
           task:         "",
           status:       "To Do",
-          estimateTime: "",
-          timeFrom:     "",
-          timeTo:       "",
+          
           totalMinutes: "",
-          workDoc:      "",
+         
           reason:       "",
           isLeave:      false,
           leaveReason:  "",
@@ -206,25 +204,7 @@ export default function TaskModal({ task, currentUser = {}, onClose, onSave, loa
                   />
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Estimate Time</label>
-                  <input
-                    className="form-input"
-                    value={form.estimateTime}
-                    onChange={e => set("estimateTime", e.target.value)}
-                    placeholder="e.g. 2 Hours, 30 min"
-                  />
-                </div>
-
-                <div className="form-group full">
-                  <label className="form-label">Work Document / Link</label>
-                  <input
-                    className="form-input"
-                    value={form.workDoc}
-                    onChange={e => set("workDoc", e.target.value)}
-                    placeholder="https://drive.google.com/…"
-                  />
-                </div>
+                
 
                 {form.status === "Hold" && (
                   <div className="form-group full">
