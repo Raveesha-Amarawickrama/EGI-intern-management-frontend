@@ -20,7 +20,6 @@ function LeaveBadge({ reason }) {
   );
 }
 
-
 function buildWeekOptions() {
   const opts = [];
   const now = new Date();
@@ -38,7 +37,6 @@ function buildWeekOptions() {
   return opts;
 }
 
-
 function weekKeyToRange(wk) {
   const [yearStr, wStr] = wk.split("-W");
   const year = parseInt(yearStr);
@@ -55,7 +53,6 @@ function weekKeyToRange(wk) {
   return { start: fmt(mon), end: fmt(sun) };
 }
 
-
 function applyDateFilter(tasks, filterMode, filterDate, filterWeek) {
   if (filterMode === "date" && filterDate) {
     return tasks.filter(t => t.date === filterDate);
@@ -66,7 +63,6 @@ function applyDateFilter(tasks, filterMode, filterDate, filterWeek) {
   }
   return tasks;
 }
-
 
 function WorkTimeInput({ taskId, initialValue, onSave }) {
   const [editing, setEditing] = useState(false);
@@ -123,7 +119,6 @@ function WorkTimeInput({ taskId, initialValue, onSave }) {
   );
 }
 
-
 function DateWeekFilter({ filterMode, setFilterMode, filterDate, setFilterDate, filterWeek, setFilterWeek, weekOptions }) {
   return (
     <>
@@ -175,7 +170,6 @@ export function InternDashboard() {
     return { mon, sun };
   };
   const { mon, sun } = getWeekBounds();
-  const weekTasks = nonLeaveTasks.filter(t => { const d = new Date(t.date); return d >= mon && d <= sun; });
 
   if (loading) return <div style={{ padding:60, textAlign:"center" }}><div className="spinner" style={{ margin:"0 auto" }}/></div>;
 
@@ -203,8 +197,6 @@ export function InternDashboard() {
 
       <div className="grid-2 mb-24">
         <WeeklyHoursCard tasks={nonLeaveTasks} noTarget/>
-      
-       
       </div>
 
       {leaveDays.filter(t => { const d=new Date(t.date); return d>=mon&&d<=sun; }).length > 0 && (
@@ -266,7 +258,7 @@ export function InternDashboard() {
 // ─── MyTasksPage (Intern) ─────────────────────────────────────────────────────
 export function MyTasksPage() {
   const { user }    = useAuth();
-  const [allTasks,  setAllTasks]  = useState([]);   
+  const [allTasks,  setAllTasks]  = useState([]);
   const [loading,   setLoading]   = useState(true);
   const [saving,    setSaving]    = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -280,13 +272,11 @@ export function MyTasksPage() {
   const [filterWeek, setFilterWeek] = useState(() => getWeekKey());
   const weekOptions = buildWeekOptions();
 
-  
   const load = useCallback(() => {
     setLoading(true);
     const params = {};
     if (status !== "All") params.status = status;
     if (search)           params.search = search;
-
     taskAPI.getAll(params)
       .then(d => { setAllTasks(d.tasks || []); setLoading(false); })
       .catch(() => setLoading(false));
@@ -294,7 +284,6 @@ export function MyTasksPage() {
 
   useEffect(() => { load(); }, [load]);
 
- 
   const tasks = applyDateFilter(allTasks, filterMode, filterDate, filterWeek);
 
   const handleSave = async (form) => {
@@ -312,15 +301,6 @@ export function MyTasksPage() {
       setShowModal(false); setEditTask(null);
     } catch (e) { setToast({ msg: e.message, type:"error" }); }
     setSaving(false);
-  };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm("Delete this task?")) return;
-    try {
-      await taskAPI.delete(id);
-      setAllTasks(ts => ts.filter(t => (t._id||t.id) !== id));
-      setToast({ msg:"Task deleted.", type:"success" });
-    } catch (e) { setToast({ msg: e.message, type:"error" }); }
   };
 
   const handleStatus = async (id, newStatus) => {
@@ -446,10 +426,10 @@ export function MyTasksPage() {
                         : <span style={{ fontSize:12, color:"var(--gray-400)" }}>—</span>}
                     </td>
                     <td>
-                      <div className="flex gap-6">
-                        {!t.isLeave && <button className="btn btn-secondary btn-sm btn-icon" onClick={() => { setEditTask(t); setShowModal(true); }}>✏️</button>}
-                        <button className="btn btn-danger btn-sm btn-icon" onClick={() => handleDelete(t._id||t.id)}>🗑</button>
-                      </div>
+                      {/* Edit only — no delete for interns */}
+                      {!t.isLeave && (
+                        <button className="btn btn-secondary btn-sm btn-icon" onClick={() => { setEditTask(t); setShowModal(true); }}>✏️</button>
+                      )}
                     </td>
                   </tr>
                 ))}
