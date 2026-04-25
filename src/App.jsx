@@ -1,22 +1,33 @@
-
 import { useState } from "react";
 import { AuthProvider, useAuth } from "./hooks/useAuth";
 import { Sidebar, Topbar } from "./components/layout/index.jsx";
 import { Spinner } from "./components/shared/index.jsx";
-import InternLoginPage      from "./components/auth/InternLoginPage.jsx";
-import SupervisorLoginPage  from "./components/auth/SupervisorLoginPage.jsx";
+
+import InternLoginPage from "./components/auth/InternLoginPage.jsx";
+import SupervisorLoginPage from "./components/auth/SupervisorLoginPage.jsx";
 import ForcedChangePassword from "./components/auth/ForcedChangePassword.jsx";
 
-
+// Intern Pages
 import { InternDashboard, MyTasksPage, ProfilePage } from "./pages/intern/index.jsx";
 
+import InternSchedulePage from "./pages/intern/Schedule.jsx";
+
+import DiaryPage from "./pages/shared/DiaryPage.jsx"
+// Supervisor Pages
 import {
-  SupervisorDashboard, AllTasksPage, InternsPage,
-  ProjectsPage, MyTasksPageSupervisor,
+  SupervisorDashboard,
+  AllTasksPage,
+  InternsPage,
+  ProjectsPage,
+  MyTasksPageSupervisor,
 } from "./pages/supervisor/index.jsx";
+import SupervisorsPage from "./pages/supervisor/SupervisorsPage.jsx";
 
+import SupervisorSchedulePage from "./pages/supervisor/Schedule.jsx";
 
-
+// Shared Pages
+import SocialPage from "./pages/shared/SocialPage.jsx";
+import FilesPage from "./pages/shared/FilesPage.jsx";
 
 function LoginChoose({ setView }) {
   return (
@@ -54,11 +65,10 @@ function LoginChoose({ setView }) {
   );
 }
 
-
 function LoginRouter() {
   const getInitialView = () => {
     const path = window.location.pathname;
-    if (path === "/intern-login")     return "intern";
+    if (path === "/intern-login") return "intern";
     if (path === "/supervisor-login") return "supervisor";
     return "choose";
   };
@@ -71,44 +81,86 @@ function LoginRouter() {
     setView(v);
   };
 
-  if (view === "intern")     return <InternLoginPage     onBack={() => goTo("choose")} />;
+  if (view === "intern") return <InternLoginPage onBack={() => goTo("choose")} />;
   if (view === "supervisor") return <SupervisorLoginPage onBack={() => goTo("choose")} />;
   return <LoginChoose setView={goTo} />;
 }
 
 function AppContent() {
-  const { user, loading, mustChangePassword } = useAuth();
+  const { user, loading, mustChangePassword, isSenior } = useAuth();
   const [page, setPage] = useState("dashboard");
 
-  if (loading)            return <Spinner />;
-  if (!user)              return <LoginRouter />;
+  if (loading) return <Spinner />;
+  if (!user) return <LoginRouter />;
   if (mustChangePassword) return <ForcedChangePassword />;
 
   const renderPage = () => {
     if (user.role === "intern") {
-      if (page === "dashboard") return <InternDashboard />;
-      if (page === "mytasks")   return <MyTasksPage />;
-      if (page === "profile")   return <ProfilePage />;
-   
+      switch (page) {
+         case "diary": return <DiaryPage />;
+        case "dashboard": return <InternDashboard />;
+        case "mytasks":   return <MyTasksPage />;
+        case "profile":   return <ProfilePage />;
+       
+        case "schedule":  return <InternSchedulePage />;
+        case "social":    return <SocialPage />;
+        case "files":     return <FilesPage />;
+        case "diary": return <DiaryPage />;
+        default:          return <div style={{ padding: 40 }}>Page not found</div>;
+      }
     }
+
     if (user.role === "supervisor") {
-      if (page === "dashboard") return <SupervisorDashboard />;
-      if (page === "tasks")     return <AllTasksPage />;
-      if (page === "mytasks")   return <MyTasksPageSupervisor />;
-      if (page === "interns")   return <InternsPage />;
-      if (page === "projects")  return <ProjectsPage />;
-  
-      if (page === "profile")   return <ProfilePage />;
+      switch (page) {
+         case "diary": return <DiaryPage />;
+        case "dashboard":   return <SupervisorDashboard />;
+        case "tasks":       return <AllTasksPage />;
+        case "mytasks":     return <MyTasksPageSupervisor />;
+        case "interns":     return <InternsPage />;
+        case "projects":    return <ProjectsPage />;
+       
+        case "schedule":    return <SupervisorSchedulePage />;
+        case "social":      return <SocialPage />;
+        case "content":     return <SocialPage view="calendar" />;
+        case "files":       return <FilesPage />;
+       
+        case "supervisors": 
+          return isSenior ? <SupervisorsPage /> : <div>Access Denied</div>;
+        default: 
+          return <div style={{ padding: 40 }}>Page not found</div>;
+      }
     }
+
     return <div style={{ padding: 40 }}>Page not found.</div>;
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "var(--gray-50)" }}>
+    <div style={{ 
+      display: "flex", 
+      minHeight: "100vh", 
+      background: "var(--gray-50)",
+      overflow: "hidden"
+    }}>
+      {/* Sidebar */}
       <Sidebar page={page} setPage={setPage} />
-      <div style={{ marginLeft: "var(--sidebar-w)", flex: 1, display: "flex", flexDirection: "column" }}>
+
+      {/* Main Content */}
+      <div style={{ 
+        marginLeft: "var(--sidebar-w)", 
+        flex: 1, 
+        display: "flex", 
+        flexDirection: "column",
+        minHeight: "100vh"
+      }}>
         <Topbar page={page} />
-        <main style={{ flex: 1, padding: "28px 32px", maxWidth: 1400, width: "100%" }}>
+
+        <main style={{ 
+          flex: 1, 
+          padding: "28px 32px", 
+          overflow: "auto",
+          maxWidth: "1400px",
+          width: "100%"
+        }}>
           {renderPage()}
         </main>
       </div>

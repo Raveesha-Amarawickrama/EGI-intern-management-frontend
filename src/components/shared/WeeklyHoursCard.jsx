@@ -52,15 +52,29 @@ export function WeeklyHoursBar({ weekMins = 0, compact = false, noTarget = false
 export default function WeeklyHoursCard({ tasks = [], weekMins: propMins, noTarget = false }) {
   const weekMins = propMins !== undefined ? propMins : (() => {
     const now = new Date();
+    // Monday of current week
     const mon = new Date(now);
     mon.setDate(now.getDate() - ((now.getDay() + 6) % 7));
     mon.setHours(0, 0, 0, 0);
+    // Sunday of current week
     const sun = new Date(mon);
     sun.setDate(mon.getDate() + 6);
     sun.setHours(23, 59, 59, 999);
+
     return tasks
-      .filter(t => { const d = new Date(t.date); return d >= mon && d <= sun; })
-      .reduce((s, t) => s + (parseInt(t.totalMinutes) || 0), 0);
+      .filter(t => {
+        if (!t.date) return false;
+        const d = new Date(t.date);
+        return d >= mon && d <= sun;
+      })
+      .reduce((s, t) => {
+        // Use parent totalMinutes; fall back to summing sub-task minutes
+        const parent = parseInt(t.totalMinutes) || 0;
+        const subs   = (t.subTasks || []).reduce(
+          (ss, st) => ss + (parseInt(st.totalMinutes) || 0), 0
+        );
+        return s + (parent > 0 ? parent : subs);
+      }, 0);
   })();
 
   const pct   = Math.min(100, Math.round((weekMins / TARGET) * 100));

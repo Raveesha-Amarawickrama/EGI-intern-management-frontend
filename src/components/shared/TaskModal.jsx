@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { userAPI, projectAPI } from "../../utils/api";
 import { todayISO } from "../../utils/helpers";
@@ -6,7 +5,7 @@ import { useAuth } from "../../hooks/useAuth";
 
 const STATUSES = ["To Do", "In Progress", "Done", "Hold"];
 
-export default function TaskModal({ task, currentUser = {}, onClose, onSave, loading }) {
+export default function TaskModal({ task, currentUser = {}, onClose, onSave, loading, extraContent }) {
   const { user: authUser, isSenior } = useAuth();
   const [interns,     setInterns]     = useState([]);
   const [allSups,     setAllSups]     = useState([]);
@@ -25,9 +24,7 @@ export default function TaskModal({ task, currentUser = {}, onClose, onSave, loa
                           : "",
           task:         "",
           status:       "To Do",
-          
           totalMinutes: "",
-         
           reason:       "",
           isLeave:      false,
           leaveReason:  "",
@@ -119,7 +116,7 @@ export default function TaskModal({ task, currentUser = {}, onClose, onSave, loa
                   color: isLeaveMode ? "#fff" : "#6b7280", transition: "all .15s",
                 }}
               >
-              Mark Leave
+                Mark Leave
               </button>
             </div>
           )}
@@ -164,7 +161,6 @@ export default function TaskModal({ task, currentUser = {}, onClose, onSave, loa
                         .map(s => <option key={s._id || s.id} value={s._id || s.id}>{s.name}</option>)}
                     </optgroup>
                   )}
-
                 </select>
               </div>
             )}
@@ -204,8 +200,6 @@ export default function TaskModal({ task, currentUser = {}, onClose, onSave, loa
                   />
                 </div>
 
-                
-
                 {form.status === "Hold" && (
                   <div className="form-group full">
                     <label className="form-label">Reason for Not Completing</label>
@@ -220,6 +214,9 @@ export default function TaskModal({ task, currentUser = {}, onClose, onSave, loa
               </>
             )}
           </div>
+
+          {/* Extra content slot (e.g. WeekendSelector) */}
+          {extraContent}
         </div>
 
         <div className="modal-footer">
