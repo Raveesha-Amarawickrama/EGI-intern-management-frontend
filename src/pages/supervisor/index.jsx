@@ -28,7 +28,7 @@ function overdueRowClass(t) {
   return "";
 }
 
-// ─── FIX 1: Render text with clickable links ──────────────────────────────────
+// ─── Render text with clickable links ──────────────────────────────────
 function TextWithLinks({ text }) {
   if (!text) return null;
   const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -60,7 +60,7 @@ function TextWithLinks({ text }) {
   );
 }
 
-// ─── FIX 2: Confirm Dialog Component ─────────────────────────────────────────
+// ─── Confirm Dialog Component (kept for other flows, e.g. reset/remove intern) ──
 function ConfirmDialog({ message, onConfirm, onCancel }) {
   return (
     <div style={{
@@ -337,9 +337,20 @@ function PaginationBar({ page, totalPages, onPage }) {
   );
 }
 
+// ─── Generic modal shell, kept at top-level (stable identity) ───────────
+function Modal({ children, onBgClick }) {
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.55)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200, padding: 16 }}
+      onClick={e => e.target === e.currentTarget && onBgClick()}>
+      <div style={{ background: "white", borderRadius: 18, maxWidth: "100%", maxHeight: "90vh", overflow: "auto", padding: "32px 28px", boxShadow: "0 24px 80px rgba(0,0,0,.3)" }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // SupervisorDashboard
-// FIX 3: Non-senior supervisor now also sees Junior Supervisor weekly hours
 // ═══════════════════════════════════════════════════════════════════════════════
 export function SupervisorDashboard() {
   const { user, isSenior } = useAuth();
@@ -355,11 +366,9 @@ export function SupervisorDashboard() {
     if (!user) return;
     const myId = String(user._id || user.id || "");
 
-    // Always fetch interns + junior supervisors
     const calls = [
       taskAPI.getAll({ internId: myId }),
       reportAPI.interns(),
-      // FIX 3: Always fetch supervisors report (both senior and non-senior need junior data)
       reportAPI.supervisors
         ? reportAPI.supervisors()
         : Promise.resolve({ report: [] }),
@@ -371,11 +380,9 @@ export function SupervisorDashboard() {
         if (r) setReport(r.report || []);
 
         const allSvs = svReport?.report || [];
-        // FIX 3: Junior supervisors shown to ALL supervisor levels (excluding self)
         setJuniorReport(allSvs.filter(sv => sv.supervisorLevel === "junior" && String(sv._id) !== myId));
 
         if (isSenior) {
-          // Senior also sees non-junior supervisors
           setSupervisorReport(allSvs.filter(sv => sv.supervisorLevel !== "junior" && String(sv._id) !== myId));
         }
 
@@ -408,7 +415,6 @@ export function SupervisorDashboard() {
 
   if (!user || loading) return <div style={{ padding: 60, textAlign: "center" }}><div className="spinner" /></div>;
 
-  // ── Reusable weekly hours row renderer ──
   const WeeklyHoursRow = ({ person, roleLabel, roleBg, roleColor, roleBorder }) => (
     <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: "1px solid #f1f5f9" }}>
       <div className="flex items-center gap-10 mb-8">
@@ -462,7 +468,6 @@ export function SupervisorDashboard() {
       </div>
 
       <div className="grid-2 mb-24">
-        {/* LEFT: Intern Weekly Hours — shown to ALL supervisors */}
         <div className="card">
           <div className="card-header">
             <div className="card-title">👥 Intern Weekly Hours</div>
@@ -503,10 +508,8 @@ export function SupervisorDashboard() {
           </div>
         </div>
 
-        {/* RIGHT column */}
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
-          {/* FIX 3: Junior Supervisor Weekly Hours — shown to ALL supervisor levels */}
           {juniorReport.length > 0 && (
             <div className="card">
               <div className="card-header">
@@ -527,7 +530,6 @@ export function SupervisorDashboard() {
             </div>
           )}
 
-          {/* Senior-only: Other (non-junior) supervisor weekly hours */}
           {isSenior && (
             <div className="card">
               <div className="card-header">
@@ -554,7 +556,6 @@ export function SupervisorDashboard() {
             </div>
           )}
 
-          {/* My Overview (for non-senior when no junior supervisors to show) */}
           {!isSenior && (
             <div>
               <div className="week-summary mb-16">
@@ -613,9 +614,6 @@ export function MyTasksPageSupervisor() {
   const [page, setPage] = useState(1);
   const [weekendDates, setWeekendDates] = useState([]);
 
-  // FIX 2: confirm dialog
-  const { confirm, ConfirmComponent } = useConfirm();
-
   const load = useCallback(() => {
     if (!user) return;
     setLoading(true);
@@ -662,17 +660,6 @@ export function MyTasksPageSupervisor() {
     setSaving(false);
   };
 
-  // FIX 2: delete with custom confirm
-  const handleDelete = async (id) => {
-    const ok = await confirm("Delete this task? This action cannot be undone.");
-    if (!ok) return;
-    try {
-      await taskAPI.delete(id);
-      setAllTasks(ts => ts.filter(t => (t._id || t.id) !== id));
-      setToast({ msg: "Task deleted.", type: "success" });
-    } catch (e) { setToast({ msg: e.message, type: "error" }); }
-  };
-
   const handleStatus = async (id, newStatus) => {
     setAllTasks(prev => prev.map(t => (t._id || t.id) === id ? { ...t, status: newStatus } : t));
     try {
@@ -699,8 +686,6 @@ export function MyTasksPageSupervisor() {
   return (
     <div className="animate-fadeUp">
       <OverdueRowStyles />
-      {/* FIX 2 */}
-      {ConfirmComponent}
       {toast && <Toast message={toast.msg} type={toast.type} onClose={() => setToast(null)} />}
       {showModal && user && (
         <TaskModal
@@ -746,7 +731,6 @@ export function MyTasksPageSupervisor() {
                   <tr key={t._id || t.id} className={overdueRowClass(t)}>
                     <td className="text-sm text-gray">{t.date}</td>
                     <td>{t.isLeave ? "—" : <span className="tag">{t.project}</span>}</td>
-                    {/* FIX 1: clickable links */}
                     <td className="text-sm" style={{ maxWidth: 220 }}>
                       {t.isLeave
                         ? <LeaveBadge reason={t.leaveReason} />
@@ -766,8 +750,6 @@ export function MyTasksPageSupervisor() {
                     <td>
                       <div className="flex gap-6">
                         {!t.isLeave && <button className="btn btn-secondary btn-sm btn-icon" onClick={() => { setEditTask(t); setShowModal(true); }}>✏️</button>}
-                        {/* FIX 2 */}
-                        <button className="btn btn-danger btn-sm btn-icon" onClick={() => handleDelete(t._id || t.id)}>🗑</button>
                       </div>
                     </td>
                   </tr>
@@ -784,7 +766,6 @@ export function MyTasksPageSupervisor() {
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // AllTasksPage
-// FIX 4: Regular supervisors can see and manage junior supervisor tasks
 // ═══════════════════════════════════════════════════════════════════════════════
 export function AllTasksPage() {
   const { user, isSenior } = useAuth();
@@ -807,27 +788,20 @@ export function AllTasksPage() {
   const [page, setPage] = useState(1);
   const [weekendDates, setWeekendDates] = useState([]);
 
-  // FIX 2: confirm dialog
-  const { confirm, ConfirmComponent } = useConfirm();
-
   const myId = user ? String(user._id || user.id || "") : "";
   const myRole = user?.role;
 
   useEffect(() => {
     if (!user || myRole !== "supervisor") return;
 
-    // FIX 4: ALL supervisors (senior, junior, plain) load interns + junior supervisors
-    // Senior additionally loads all supervisor levels
     if (isSenior) {
       Promise.all([userAPI.getAll("intern"), userAPI.getAll("supervisor")])
         .then(([i, s]) => setFilterUsers([...(i.users || []), ...(s.users || [])]))
         .catch(() => {});
     } else {
-      // FIX 4: Non-senior supervisors also see junior supervisors (not just interns)
       Promise.all([userAPI.getAll("intern"), userAPI.getAll("supervisor")])
         .then(([i, s]) => {
           const interns = i.users || [];
-          // Only include junior supervisors for non-senior
           const juniorSvs = (s.users || []).filter(u => u.supervisorLevel === "junior");
           setFilterUsers([...interns, ...juniorSvs]);
         })
@@ -884,17 +858,6 @@ export function AllTasksPage() {
       setShowModal(false); setEditTask(null);
     } catch (e) { setToast({ msg: e.message, type: "error" }); }
     setSaving(false);
-  };
-
-  // FIX 2: delete with custom confirm
-  const handleDelete = async (id) => {
-    const ok = await confirm("Delete this task? This action cannot be undone.");
-    if (!ok) return;
-    try {
-      await taskAPI.delete(id);
-      setAllTasks(ts => ts.filter(t => (t._id || t.id) !== id));
-      setToast({ msg: "Deleted.", type: "success" });
-    } catch (e) { setToast({ msg: e.message, type: "error" }); }
   };
 
   const handleStatus = async (id, newStatus) => {
@@ -972,7 +935,6 @@ export function AllTasksPage() {
     return (
       <div className="animate-fadeUp">
         <OverdueRowStyles />
-        {ConfirmComponent}
         {toast && <Toast message={toast.msg} type={toast.type} onClose={() => setToast(null)} />}
         {showModal && user && (
           <TaskModal task={editTask} currentUser={user}
@@ -989,7 +951,6 @@ export function AllTasksPage() {
           <div style={{ padding: "20px 24px" }}>
             <p style={{ fontSize: 13, color: "var(--gray-400)", marginBottom: 24 }}>Select a member below to view and manage their tasks.</p>
 
-            {/* Interns */}
             {internMembers.length > 0 && (
               <>
                 <div style={{ fontSize: 11, fontWeight: 700, color: "var(--gray-400)", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 12 }}>
@@ -1001,7 +962,6 @@ export function AllTasksPage() {
               </>
             )}
 
-            {/* FIX 4: Junior supervisors visible to ALL supervisor levels */}
             {supervisorMembers.filter(m => m.supervisorLevel === "junior").length > 0 && (
               <>
                 <div style={{ fontSize: 11, fontWeight: 700, color: "var(--gray-400)", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 12 }}>
@@ -1013,7 +973,6 @@ export function AllTasksPage() {
               </>
             )}
 
-            {/* Senior-only: plain supervisors and senior supervisors */}
             {isSenior && (
               <>
                 {supervisorMembers.filter(m => m.supervisorLevel === "supervisor").length > 0 && (
@@ -1057,8 +1016,6 @@ export function AllTasksPage() {
   return (
     <div className="animate-fadeUp">
       <OverdueRowStyles />
-      {/* FIX 2 */}
-      {ConfirmComponent}
       {toast && <Toast message={toast.msg} type={toast.type} onClose={() => setToast(null)} />}
       {showModal && user && (
         <TaskModal task={editTask} currentUser={user}
@@ -1113,7 +1070,6 @@ export function AllTasksPage() {
                   <tr key={t._id || t.id} className={overdueRowClass(t)}>
                     <td className="text-sm text-gray">{t.date}</td>
                     <td>{t.isLeave ? "—" : <span className="tag">{t.project}</span>}</td>
-                    {/* FIX 1: clickable links */}
                     <td className="text-sm" style={{ maxWidth: 200 }}>
                       {t.isLeave
                         ? <LeaveBadge reason={t.leaveReason} />
@@ -1152,8 +1108,6 @@ export function AllTasksPage() {
                     <td>
                       <div className="flex gap-6">
                         {!t.isLeave && <button className="btn btn-secondary btn-sm btn-icon" onClick={() => { setEditTask(t); setShowModal(true); }}>✏️</button>}
-                        {/* FIX 2: custom confirm */}
-                        <button className="btn btn-danger btn-sm btn-icon" onClick={() => handleDelete(t._id || t.id)}>🗑</button>
                       </div>
                     </td>
                   </tr>
@@ -1240,15 +1194,6 @@ export function InternsPage() {
   };
 
   if (loading) return <div style={{ padding: 60, textAlign: "center" }}><div className="spinner" /></div>;
-
-  const Modal = ({ children, onBgClick }) => (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.55)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200, padding: 16 }}
-      onClick={e => e.target === e.currentTarget && onBgClick()}>
-      <div style={{ background: "white", borderRadius: 18, maxWidth: "100%", maxHeight: "90vh", overflow: "auto", padding: "32px 28px", boxShadow: "0 24px 80px rgba(0,0,0,.3)" }}>
-        {children}
-      </div>
-    </div>
-  );
 
   const InternPaginationBar = () => {
     if (totalPages <= 1) return null;

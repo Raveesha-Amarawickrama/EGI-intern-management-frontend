@@ -346,14 +346,7 @@ function ConfirmDialog({ message, onConfirm, onCancel }) {
               cursor: "pointer", fontFamily: "inherit",
             }}
           >Cancel</button>
-          <button
-            onClick={onConfirm}
-            style={{
-              padding: "9px 22px", borderRadius: 9, border: "none",
-              background: "#ef4444", color: "white", fontSize: 13, fontWeight: 700,
-              cursor: "pointer", fontFamily: "inherit",
-            }}
-          >Yes, Delete</button>
+          
         </div>
       </div>
     </div>
@@ -615,16 +608,7 @@ export function MyTasksPage() {
     setAllTasks(ts => ts.map(t => (t._id || t.id) === (updated._id || updated.id) ? updated : t));
   };
 
-  // FIX 2: delete with custom confirm dialog
-  const handleDelete = async (id) => {
-    const ok = await confirm("Delete this task? This action cannot be undone.");
-    if (!ok) return;
-    try {
-      await taskAPI.delete(id);
-      setAllTasks(ts => ts.filter(t => (t._id || t.id) !== id));
-      setToast({ msg: "Task deleted.", type: "success" });
-    } catch (e) { setToast({ msg: e.message, type: "error" }); }
-  };
+  
 
   const leaveDays = allTasks.filter(t => t.isLeave).length;
 
@@ -740,9 +724,8 @@ export function MyTasksPage() {
                           <button className="btn btn-secondary btn-sm btn-icon"
                             onClick={() => { setEditTask(t); setShowModal(true); }}>✏️</button>
                         )}
-                        {/* FIX 2: delete now uses custom confirm */}
-                        <button className="btn btn-danger btn-sm btn-icon"
-                          onClick={() => handleDelete(t._id || t.id)}>🗑</button>
+                     
+                      
                       </div>
                     </td>
                   </tr>

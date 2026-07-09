@@ -4,6 +4,82 @@ import { Avatar, Toast } from "../../components/shared/index.jsx";
 import { useAuth } from "../../hooks/useAuth";
 import { formatMinutes } from "../../utils/helpers";
 
+// ─── Top-level components (stable identity across renders) ────────────────
+// Moved OUTSIDE SupervisorsPage. Previously these were declared inside the
+// component body, which meant React created a brand-new component type on
+// every render (e.g. every keystroke in a form). That caused React to
+// unmount/remount the whole subtree -- including <input> elements -- so
+// inputs lost focus after every single character typed.
+
+function Modal({ children, onBgClick }) {
+  return (
+    <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.55)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:200, padding:16 }}
+      onClick={e => e.target === e.currentTarget && onBgClick()}>
+      <div style={{ background:"white", borderRadius:18, maxWidth:"100%", maxHeight:"90vh", overflow:"auto", padding:"32px 28px", boxShadow:"0 24px 80px rgba(0,0,0,.3)" }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function getRoleBadge(sv) {
+  if (sv.supervisorLevel === "senior") return { label:"Senior Supervisor", bg:"#faf5ff", color:"#7c3aed", border:"#ddd6fe" };
+  if (sv.supervisorLevel === "junior") return { label:"Junior Supervisor", bg:"#fff7ed", color:"#c2410c", border:"#fed7aa" };
+  return                                      { label:"Supervisor",        bg:"#f0fdf4", color:"#166534", border:"#bbf7d0" };
+}
+
+function SupervisorCard({ sv, isSenior, onDelete, onResetPassword }) {
+  const badge = getRoleBadge(sv);
+  return (
+    <div className="intern-card">
+      <div className="flex items-center gap-12 mb-16">
+        <Avatar initials={sv.avatar} color={sv.avatarColor} size="lg"/>
+        <div style={{ flex:1 }}>
+          <div style={{ fontFamily:"Syne,sans-serif", fontWeight:800, fontSize:15, color:"var(--green-900)" }}>{sv.name}</div>
+          <div style={{ fontSize:12, fontWeight:600, marginTop:3 }}>
+            <span style={{ padding:"2px 10px", borderRadius:99, fontSize:11, fontWeight:700, background:badge.bg, color:badge.color, border:`1px solid ${badge.border}` }}>
+              {badge.label}
+            </span>
+          </div>
+        </div>
+        {isSenior && sv.supervisorLevel !== "senior" && (
+          <button onClick={() => onDelete(sv)} style={{ background:"none", border:"none", cursor:"pointer", fontSize:16, color:"#ef4444", padding:"4px" }}>🗑</button>
+        )}
+      </div>
+
+      <div style={{ fontSize:12, color:"var(--gray-500)", marginBottom:12, display:"flex", flexDirection:"column", gap:4 }}>
+        <div>📧 {sv.email}</div>
+        {sv.contact && <div>📞 {sv.contact}</div>}
+        {sv.position && <div>💼 {sv.position}</div>}
+        {sv.department && <div>🏢 {sv.department}</div>}
+      </div>
+
+      {isSenior && (
+        <button onClick={() => onResetPassword(sv)}
+          style={{ marginTop:8, width:"100%", padding:"7px", borderRadius:8, border:"1px solid #fecaca", background:"#fef2f2", color:"#dc2626", fontSize:12, fontWeight:600, cursor:"pointer", fontFamily:"inherit" }}>
+          🔑 Reset Password
+        </button>
+      )}
+    </div>
+  );
+}
+
+function Section({ title, list, isSenior, onDelete, onResetPassword }) {
+  if (list.length === 0) return null;
+  return (
+    <>
+      <div style={{ fontSize:11, fontWeight:700, color:"var(--gray-400)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:12, marginTop:24 }}>
+        {title} ({list.length})
+      </div>
+      <div className="grid-3">
+        {list.map(sv => (
+          <SupervisorCard key={sv._id} sv={sv} isSenior={isSenior} onDelete={onDelete} onResetPassword={onResetPassword} />
+        ))}
+      </div>
+    </>
+  );
+}
+
 export function SupervisorsPage() {
   const { user, isSenior } = useAuth();
   const [supervisors,      setSupervisors]      = useState([]);
@@ -72,73 +148,11 @@ export function SupervisorsPage() {
     setResetting(false);
   };
 
-  const getRoleBadge = (sv) => {
-    if (sv.supervisorLevel === "senior") return { label:"Senior Supervisor", bg:"#faf5ff", color:"#7c3aed", border:"#ddd6fe" };
-    if (sv.supervisorLevel === "junior") return { label:"Junior Supervisor", bg:"#fff7ed", color:"#c2410c", border:"#fed7aa" };
-    return                                      { label:"Supervisor",        bg:"#f0fdf4", color:"#166534", border:"#bbf7d0" };
-  };
-
   if (loading) return <div style={{ padding:60, textAlign:"center" }}><div className="spinner"/></div>;
-
-  const Modal = ({ children, onBgClick }) => (
-    <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.55)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:200, padding:16 }}
-      onClick={e => e.target === e.currentTarget && onBgClick()}>
-      <div style={{ background:"white", borderRadius:18, maxWidth:"100%", maxHeight:"90vh", overflow:"auto", padding:"32px 28px", boxShadow:"0 24px 80px rgba(0,0,0,.3)" }}>
-        {children}
-      </div>
-    </div>
-  );
 
   const juniors   = supervisors.filter(s => s.supervisorLevel === "junior");
   const plains    = supervisors.filter(s => s.supervisorLevel === "supervisor");
   const seniors   = supervisors.filter(s => s.supervisorLevel === "senior");
-
-  const SupervisorCard = ({ sv }) => {
-    const badge = getRoleBadge(sv);
-    return (
-      <div className="intern-card">
-        <div className="flex items-center gap-12 mb-16">
-          <Avatar initials={sv.avatar} color={sv.avatarColor} size="lg"/>
-          <div style={{ flex:1 }}>
-            <div style={{ fontFamily:"Syne,sans-serif", fontWeight:800, fontSize:15, color:"var(--green-900)" }}>{sv.name}</div>
-            <div style={{ fontSize:12, fontWeight:600, marginTop:3 }}>
-              <span style={{ padding:"2px 10px", borderRadius:99, fontSize:11, fontWeight:700, background:badge.bg, color:badge.color, border:`1px solid ${badge.border}` }}>
-                {badge.label}
-              </span>
-            </div>
-          </div>
-          {isSenior && sv.supervisorLevel !== "senior" && (
-            <button onClick={() => setDeleteTarget(sv)} style={{ background:"none", border:"none", cursor:"pointer", fontSize:16, color:"#ef4444", padding:"4px" }}>🗑</button>
-          )}
-        </div>
-
-        <div style={{ fontSize:12, color:"var(--gray-500)", marginBottom:12, display:"flex", flexDirection:"column", gap:4 }}>
-          <div>📧 {sv.email}</div>
-          {sv.contact && <div>📞 {sv.contact}</div>}
-          {sv.position && <div>💼 {sv.position}</div>}
-          {sv.department && <div>🏢 {sv.department}</div>}
-        </div>
-
-        {isSenior && (
-          <button onClick={() => setResetTarget(sv)}
-            style={{ marginTop:8, width:"100%", padding:"7px", borderRadius:8, border:"1px solid #fecaca", background:"#fef2f2", color:"#dc2626", fontSize:12, fontWeight:600, cursor:"pointer", fontFamily:"inherit" }}>
-            🔑 Reset Password
-          </button>
-        )}
-      </div>
-    );
-  };
-
-  const Section = ({ title, list }) => list.length === 0 ? null : (
-    <>
-      <div style={{ fontSize:11, fontWeight:700, color:"var(--gray-400)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:12, marginTop:24 }}>
-        {title} ({list.length})
-      </div>
-      <div className="grid-3">
-        {list.map(sv => <SupervisorCard key={sv._id} sv={sv}/>)}
-      </div>
-    </>
-  );
 
   return (
     <div className="animate-fadeUp">
@@ -249,13 +263,13 @@ export function SupervisorsPage() {
         </div>
       ) : (
         <>
-          <Section title="Junior Supervisors"  list={juniors}/>
-          <Section title="Supervisors"         list={plains}/>
-          <Section title="Senior Supervisors"  list={seniors}/>
+          <Section title="Junior Supervisors"  list={juniors} isSenior={isSenior} onDelete={setDeleteTarget} onResetPassword={setResetTarget}/>
+          <Section title="Supervisors"         list={plains}  isSenior={isSenior} onDelete={setDeleteTarget} onResetPassword={setResetTarget}/>
+          <Section title="Senior Supervisors"  list={seniors} isSenior={isSenior} onDelete={setDeleteTarget} onResetPassword={setResetTarget}/>
         </>
       )}
     </div>
   );
 }
-// Add this at the very end of SupervisorsPage.jsx
+
 export default SupervisorsPage;
