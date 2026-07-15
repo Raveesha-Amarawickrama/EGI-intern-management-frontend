@@ -39,6 +39,7 @@ const SUPERVISOR_NAV_SENIOR = [
   { key: "dashboard",   label: "Dashboard"     },
   { key: "tasks",       label: "All Tasks"     },
   { key: "mytasks",     label: "My Tasks"      },
+    { key: "profile",     label: "My Profile"    },   
   { key: "interns",     label: "Interns"       },
   { key: "supervisors", label: "Supervisors"   },
   { key: "projects",    label: "Projects"      },
@@ -47,6 +48,7 @@ const SUPERVISOR_NAV_SENIOR = [
   { key: "social",      label: "Post Approval" },
   { key: "content",     label: "Content Cal."  },
   { key: "files",       label: "Files"         },
+  
 
 ];
 
@@ -55,6 +57,7 @@ const SUPERVISOR_NAV_JUNIOR = [
   { key: "dashboard", label: "Dashboard"     },
   { key: "tasks",     label: "All Tasks"     },
   { key: "mytasks",   label: "My Tasks"      },
+    { key: "profile",     label: "My Profile"    },   
   { key: "interns",   label: "Interns"       },
   { key: "projects",  label: "Projects"      },
  

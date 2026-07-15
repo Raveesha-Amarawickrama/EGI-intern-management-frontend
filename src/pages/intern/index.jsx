@@ -147,12 +147,12 @@ function buildWeekOptions() {
     const d = new Date(now);
     d.setDate(now.getDate() - i * 7);
     const wk = getWeekKey(d);
-    const mon = new Date(d);
-    mon.setDate(d.getDate() - ((d.getDay() + 6) % 7));
-    const sun = new Date(mon);
-    sun.setDate(mon.getDate() + 6);
+    const sun = new Date(d);
+    sun.setDate(d.getDate() - d.getDay());
+    const sat = new Date(sun);
+    sat.setDate(sun.getDate() + 6);
     const fmt = dt => dt.toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
-    opts.push({ value: wk, label: `${wk}  (${fmt(mon)} – ${fmt(sun)})` });
+    opts.push({ value: wk, label: `${wk}  (${fmt(sun)} – ${fmt(sat)})` });
   }
   return opts;
 }
@@ -162,15 +162,14 @@ function weekKeyToRange(wk) {
   const year = parseInt(yearStr);
   const week = parseInt(wStr);
   const jan1 = new Date(year, 0, 1);
-  const jan1Day = jan1.getDay();
-  const daysToMon = jan1Day === 0 ? 1 : jan1Day === 1 ? 0 : 8 - jan1Day;
-  const firstMon = new Date(year, 0, 1 + daysToMon);
-  const mon = new Date(firstMon);
-  mon.setDate(firstMon.getDate() + (week - 1) * 7);
-  const sun = new Date(mon);
-  sun.setDate(mon.getDate() + 6);
+  const jan1Sunday = new Date(jan1);
+  jan1Sunday.setDate(jan1.getDate() - jan1.getDay());
+  const start = new Date(jan1Sunday);
+  start.setDate(jan1Sunday.getDate() + (week - 1) * 7);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
   const fmt = d => d.toISOString().split("T")[0];
-  return { start: fmt(mon), end: fmt(sun) };
+  return { start: fmt(start), end: fmt(end) };
 }
 
 function applyDateFilter(tasks, filterMode, filterDate, filterWeek) {
@@ -407,9 +406,11 @@ export function InternDashboard() {
   const leaveDays = tasks.filter(t => t.isLeave);
   const { total, done, inProgress, hold } = computeStats(nonLeaveTasks);
 
-  const getWeekBounds = () => {
+const getWeekBounds = () => {
+    // Week = Sunday → Saturday. Kept the { mon, sun } shape so the rest
+    // of the component (d >= mon && d <= sun) needs no other changes.
     const now = new Date();
-    const mon = new Date(now); mon.setDate(now.getDate() - ((now.getDay() + 6) % 7)); mon.setHours(0, 0, 0, 0);
+    const mon = new Date(now); mon.setDate(now.getDate() - now.getDay()); mon.setHours(0, 0, 0, 0);
     const sun = new Date(mon); sun.setDate(mon.getDate() + 6); sun.setHours(23, 59, 59, 999);
     return { mon, sun };
   };

@@ -2,7 +2,6 @@ import { formatMinutes } from "../../utils/helpers";
 
 const TARGET = 30 * 60;
 
-
 export function WeeklyHoursBar({ weekMins = 0, compact = false, noTarget = false }) {
   const pct   = Math.min(100, Math.round((weekMins / TARGET) * 100));
   const left  = Math.max(0, TARGET - weekMins);
@@ -52,23 +51,22 @@ export function WeeklyHoursBar({ weekMins = 0, compact = false, noTarget = false
 export default function WeeklyHoursCard({ tasks = [], weekMins: propMins, noTarget = false }) {
   const weekMins = propMins !== undefined ? propMins : (() => {
     const now = new Date();
-    // Monday of current week
-    const mon = new Date(now);
-    mon.setDate(now.getDate() - ((now.getDay() + 6) % 7));
-    mon.setHours(0, 0, 0, 0);
     // Sunday of current week
-    const sun = new Date(mon);
-    sun.setDate(mon.getDate() + 6);
-    sun.setHours(23, 59, 59, 999);
+    const sun = new Date(now);
+    sun.setDate(now.getDate() - now.getDay());
+    sun.setHours(0, 0, 0, 0);
+    // Saturday of current week
+    const sat = new Date(sun);
+    sat.setDate(sun.getDate() + 6);
+    sat.setHours(23, 59, 59, 999);
 
     return tasks
       .filter(t => {
         if (!t.date) return false;
         const d = new Date(t.date);
-        return d >= mon && d <= sun;
+        return d >= sun && d <= sat;
       })
       .reduce((s, t) => {
-        // Use parent totalMinutes; fall back to summing sub-task minutes
         const parent = parseInt(t.totalMinutes) || 0;
         const subs   = (t.subTasks || []).reduce(
           (ss, st) => ss + (parseInt(st.totalMinutes) || 0), 0
@@ -114,7 +112,7 @@ export default function WeeklyHoursCard({ tasks = [], weekMins: propMins, noTarg
 
         <div style={{ display:"grid", gridTemplateColumns:`repeat(${noTarget ? 2 : 3}, 1fr)`, gap:10, marginTop:16, textAlign:"center" }}>
           {[
-            ["Mon–Sun", formatMinutes(weekMins), color],
+            ["Sun–Sat", formatMinutes(weekMins), color],
             ...(noTarget ? [] : [["Target", "30h", "#6b7280"]]),
             ["Daily ~", "8h", "#6b7280"],
           ].map(([l, v, c]) => (

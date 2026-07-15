@@ -1,6 +1,5 @@
 export const todayISO = () => new Date().toISOString().split("T")[0];
 
-
 export const formatMinutes = (mins) => {
   const n = parseInt(mins) || 0;
   if (n <= 0) return "0m";
@@ -32,21 +31,38 @@ export const statusSelectClass = (s) => ({
   "Done":"status-done","In Progress":"status-progress","Hold":"status-hold","To Do":"status-todo",
 })[s] || "";
 
+// ── Week runs Sunday → Saturday (7 days) ────────────────────────────────────
 export const getWeekKey = (date = new Date()) => {
-  const d    = new Date(date);
-  const jan1 = new Date(d.getFullYear(), 0, 1);
-  const week = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
-  return `${d.getFullYear()}-W${String(week).padStart(2, "0")}`;
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() - d.getDay()); // back up to Sunday
+  const year = d.getFullYear();
+  const jan1 = new Date(year, 0, 1);
+  const jan1Sunday = new Date(jan1);
+  jan1Sunday.setDate(jan1.getDate() - jan1.getDay());
+  const diffDays = Math.round((d - jan1Sunday) / 86400000);
+  const week = Math.floor(diffDays / 7) + 1;
+  return `${year}-W${String(week).padStart(2, "0")}`;
+};
+
+export const weekKeyToRange = (wk) => {
+  const [yearStr, wStr] = wk.split("-W");
+  const year = parseInt(yearStr);
+  const week = parseInt(wStr);
+  const jan1 = new Date(year, 0, 1);
+  const jan1Sunday = new Date(jan1);
+  jan1Sunday.setDate(jan1.getDate() - jan1.getDay());
+  const start = new Date(jan1Sunday);
+  start.setDate(jan1Sunday.getDate() + (week - 1) * 7);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+  const fmt = d => d.toISOString().split("T")[0];
+  return { start: fmt(start), end: fmt(end) };
 };
 
 export const weeklyMinsFromTasks = (tasks = []) => {
   const wk = getWeekKey();
   return tasks
-    .filter(t => {
-      const d    = new Date(t.date);
-      const jan1 = new Date(d.getFullYear(), 0, 1);
-      const week = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
-      return `${d.getFullYear()}-W${String(week).padStart(2, "0")}` === wk;
-    })
+    .filter(t => t.date && getWeekKey(new Date(t.date)) === wk)
     .reduce((s, t) => s + (parseInt(t.totalMinutes) || 0), 0);
 };

@@ -8,7 +8,8 @@ import SupervisorLoginPage from "./components/auth/SupervisorLoginPage.jsx";
 import ForcedChangePassword from "./components/auth/ForcedChangePassword.jsx";
 
 // Intern Pages
-import { InternDashboard, MyTasksPage, ProfilePage } from "./pages/intern/index.jsx";
+import { InternDashboard, MyTasksPage } from "./pages/intern/index.jsx";
+import ProfilePage from "./pages/shared/ProfilePage.jsx";
 
 import InternSchedulePage from "./pages/intern/Schedule.jsx";
 
@@ -116,6 +117,7 @@ function AppContent() {
         case "dashboard":   return <SupervisorDashboard />;
         case "tasks":       return <AllTasksPage />;
         case "mytasks":     return <MyTasksPageSupervisor />;
+        case "profile":     return <ProfilePage />;   
         case "interns":     return <InternsPage />;
         case "projects":    return <ProjectsPage />;
        
