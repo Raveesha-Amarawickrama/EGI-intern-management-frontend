@@ -4,6 +4,14 @@ export const getToken   = ()  => localStorage.getItem("egi_token");
 export const setToken   = (t) => localStorage.setItem("egi_token", t);
 export const clearToken = ()  => localStorage.removeItem("egi_token");
 
+
+export const IMAGE_BASE = BASE.replace(/\/api\/?$/, "");
+export function resolveImageUrl(p) {
+  if (!p) return null;
+  if (/^https?:\/\//i.test(p)) return p;
+  return `${IMAGE_BASE}${p.startsWith("/") ? "" : "/"}${p}`;
+}
+
 async function request(path, options = {}) {
   const token   = getToken();
   const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
@@ -22,7 +30,7 @@ export const authAPI = {
   changePassword: (body)         => request("/auth/change-password",          { method:"PATCH", body: JSON.stringify(body) }),
   resetPassword:  (userId, body) => request(`/auth/reset-password/${userId}`, { method:"PATCH", body: JSON.stringify(body) }),
   registerSupervisor: (data) => request("/auth/register-supervisor", { method:"POST", body: JSON.stringify(data) }),
-deleteSupervisor:   (id)   => request(`/auth/supervisor/${id}`,    { method:"DELETE" }),
+  deleteSupervisor:   (id)   => request(`/auth/supervisor/${id}`,    { method:"DELETE" }),
 };
 
 export const taskAPI = {
@@ -54,6 +62,39 @@ export const userAPI = {
   update:   (id, body) => request(`/users/${id}`, { method:"PATCH",  body: JSON.stringify(body) }),
   delete:   (id)       => request(`/users/${id}`, { method:"DELETE" }),
   getStats: (id)       => request(`/users/${id}/stats`),
+
+  // ── profile picture ──────────────────────────────────────────────────────
+  uploadProfilePicture: (id, file) => {
+    const formData = new FormData();
+    formData.append("profilePicture", file);
+    const token = getToken();
+    return fetch(`${BASE}/users/${id}/profile-picture`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    }).then(async res => {
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Upload failed");
+      return data;
+    });
+  },
+  deleteProfilePicture: (id) => request(`/users/${id}/profile-picture`, { method: "DELETE" }),
+
+  uploadDocument: (id, docType, file) => {
+    const formData = new FormData();
+    formData.append("document", file);
+    const token = getToken();
+    return fetch(`${BASE}/users/${id}/documents/${docType}`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    }).then(async res => {
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Upload failed");
+      return data;
+    });
+  },
+  deleteDocument: (id, docType) => request(`/users/${id}/documents/${docType}`, { method: "DELETE" }),
 };
 
 export const projectAPI = {
@@ -70,19 +111,17 @@ export const reportAPI = {
    supervisors: () => request("/reports/supervisors"),
 };
 
-// ── Messages ──────────────────────────────────────────────────────────────────
-// In messageAPI object in api.js
 export const messageAPI = {
   getConversations:    ()            => request("/messages/conversations"),
   getUsers:            ()            => request("/messages/users"),
   getMessages:         (userId)      => request(`/messages/${userId}`),
   send:                (body)        => request("/messages",   { method:"POST", body: JSON.stringify(body) }),
   markRead:            (userId)      => request(`/messages/${userId}/read`, { method:"PATCH" }),
-  sendGroupMessage:    (body)        => request("/messages/group", { method:"POST", body: JSON.stringify(body) }), // ✅ NEW
+  sendGroupMessage:    (body)        => request("/messages/group", { method:"POST", body: JSON.stringify(body) }),
   deleteGroupMessage:  (messageId)   => request(`/messages/message/${messageId}`, { method:"DELETE" }),
   deleteDirectMessage: (messageId)   => request(`/messages/message/${messageId}`, { method:"DELETE" }),
 };
-// ── Meetings ──────────────────────────────────────────────────────────────────
+
 export const meetingAPI = {
   getAll:       ()           => request("/meetings"),
   create:       (body)       => request("/meetings",            { method:"POST",   body: JSON.stringify(body) }),
@@ -91,7 +130,6 @@ export const meetingAPI = {
   delete:       (id)         => request(`/meetings/${id}`,      { method:"DELETE" }),
 };
 
-
 export const fileAPI = {
   getAll: (params = {}) => {
     const qs = new URLSearchParams(
@@ -99,10 +137,7 @@ export const fileAPI = {
     ).toString();
     return request(`/files${qs ? "?" + qs : ""}`);
   },
-
-  // ← NEW: fetch files scoped to a project folder
   getByProject: (projectId) => request(`/files/project/${projectId}`),
-
   upload: (file, projectId = null) => {
     const formData = new FormData();
     formData.append("file", file);
@@ -121,9 +156,7 @@ export const fileAPI = {
       return data;
     });
   },
-
   delete: (id) => request(`/files/${id}`, { method: "DELETE" }),
-
   download: async (id, originalName) => {
     const token = getToken();
     const res = await fetch(`${BASE}/files/${id}/download`, {
@@ -138,4 +171,21 @@ export const fileAPI = {
     a.click();
     URL.revokeObjectURL(url);
   },
+};
+
+export const thirdPartyItemAPI = {
+  getAll: ()           => request("/third-party-items"),
+  getOne: (id)         => request(`/third-party-items/${id}`),
+  create: (body)       => request("/third-party-items",       { method: "POST",   body: JSON.stringify(body) }),
+  update: (id, body)   => request(`/third-party-items/${id}`, { method: "PATCH",  body: JSON.stringify(body) }),
+  markRenewed: (id)    => request(`/third-party-items/${id}/renew`, { method: "PATCH" }),
+  checkRemindersNow: () => request(`/third-party-items/check-reminders`, { method: "POST" }), // ← NEW
+  delete: (id)         => request(`/third-party-items/${id}`, { method: "DELETE" }),
+};
+
+
+export const renewalNotificationAPI = {
+  getAll:      ()   => request("/renewal-notifications"),
+  markRead:    (id) => request(`/renewal-notifications/${id}/read`, { method: "PATCH" }),
+  markAllRead: ()   => request("/renewal-notifications/read-all",   { method: "PATCH" }),
 };

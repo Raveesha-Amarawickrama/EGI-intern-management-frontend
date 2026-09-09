@@ -1,5 +1,6 @@
 import { useAuth } from "../../hooks/useAuth";
 import { Avatar } from "../shared/index.jsx";
+import RenewalNotificationBell from "../shared/RenewalNotificationBell.jsx";
 import egiLogo from "../../assets/logo.png";
 
 // ── SVG Icons ────────────────────────────────────────────────────────────────
@@ -17,8 +18,10 @@ const icons = {
   files:       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>,
   profile:     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
   signout:     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
-  // ── NEW: diary icon (book/pen) ──────────────────────────────────────────
+  // ── diary icon (book/pen) ────────────────────────────────────────────────
   diary:       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/><line x1="12" y1="6" x2="16" y2="6"/><line x1="12" y1="10" x2="16" y2="10"/><line x1="12" y1="14" x2="14" y2="14"/></svg>,
+  // ── NEW: renewals icon (refresh/clock) ──────────────────────────────────
+  renewals:    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 11-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg>,
 };
 
 // ── Nav Data ─────────────────────────────────────────────────────────────────
@@ -48,7 +51,8 @@ const SUPERVISOR_NAV_SENIOR = [
   { key: "social",      label: "Post Approval" },
   { key: "content",     label: "Content Cal."  },
   { key: "files",       label: "Files"         },
-  
+  // ── NEW: renewals nav item (senior) ────────────────────────────────────
+  { key: "renewals",    label: "Renewals"      },
 
 ];
 
@@ -82,6 +86,8 @@ const META = {
   social:      { title: "Post Approval",     sub: "Review and approve social media drafts" },
   content:     { title: "Content Calendar",  sub: "Published content overview"             },
   files:       { title: "Files",             sub: "Upload, share and manage documents"     },
+  // ── NEW: renewals page meta ───────────────────────────────────────────────
+  renewals:    { title: "Third-Party Renewals", sub: "Track subscriptions, licenses and contracts" },
   
 };
 
@@ -309,7 +315,7 @@ export function Sidebar({ page, setPage }) {
             marginBottom: 10,
           }}>
             <div style={{ position: "relative", flexShrink: 0 }}>
-              <Avatar initials={user?.name?.charAt(0) || "U"} color={user?.avatarColor || "#10b981"} size="sm" />
+              <Avatar initials={user?.name?.charAt(0) || "U"} color={user?.avatarColor || "#10b981"} size="sm" src={user?.profilePicture} />
               <span style={{
                 position: "absolute", bottom: 0, right: 0,
                 width: 8, height: 8, borderRadius: "50%",
@@ -414,6 +420,9 @@ export function Topbar({ page }) {
 
         {/* Right */}
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+          {/* ── NEW: renewal reminder bell, senior supervisors only ── */}
+          {isSenior && <RenewalNotificationBell />}
+
           <div className="egi-topbar-date">{now}</div>
           <div style={{ width: 1, height: 28, background: "#e2e8f0" }} />
           <span style={{
@@ -436,7 +445,7 @@ export function Topbar({ page }) {
               </div>
             </div>
             <div style={{ position: "relative" }}>
-              <Avatar initials={user?.name?.charAt(0)} color={user?.avatarColor || "#10b981"} size="sm" />
+              <Avatar initials={user?.name?.charAt(0)} color={user?.avatarColor || "#10b981"} size="sm" src={user?.profilePicture} />
               <span style={{
                 position: "absolute", bottom: 0, right: 0,
                 width: 8, height: 8, borderRadius: "50%",

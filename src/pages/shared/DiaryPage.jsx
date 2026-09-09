@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 
-// ─── Storage (swap fn bodies for real API calls in production) ────────────────
+
 const DIARY_KEY = "egi_diary_v2";
 const DB = {
   load: () => { try { return JSON.parse(localStorage.getItem(DIARY_KEY) || "[]"); } catch { return []; } },
   save: (d) => localStorage.setItem(DIARY_KEY, JSON.stringify(d)),
 };
 
-// ─── File helpers ─────────────────────────────────────────────────────────────
+
 function getFileType(name = "") {
   const ext = (name.split(".").pop() || "").toLowerCase();
   if (["jpg","jpeg","png","gif","webp","svg","bmp"].includes(ext))
@@ -42,7 +42,7 @@ const fmtDateShort = (s) => {
   return new Date(s + "T00:00:00").toLocaleDateString("en-GB", { day:"2-digit", month:"short", year:"numeric" });
 };
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+
 const TAGS = ["#work","#personal","#study","#meeting","#idea","#mood","#goal"];
 const TAG_PALETTE = {
   "#work":     { bg:"#dbeafe", fg:"#1e40af", border:"#93c5fd" },
@@ -70,9 +70,7 @@ function getMonthGrid(year, month) {
   return { firstDay, total };
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// MICRO-COMPONENTS
-// ═══════════════════════════════════════════════════════════════════════════════
+
 
 function Chip({ tag, onRemove, tiny }) {
   const c = TAG_PALETTE[tag] || { bg:"#f1f5f9", fg:"#475569", border:"#cbd5e1" };
@@ -116,7 +114,7 @@ function MoodPicker({ value, onChange }) {
   );
 }
 
-// ─── File attachment tile (image) ─────────────────────────────────────────────
+
 function ImgTile({ file, onRemove }) {
   return (
     <div style={{ position:"relative", borderRadius:12, overflow:"hidden", width:100, height:100, flexShrink:0, boxShadow:"0 2px 8px rgba(0,0,0,.12)" }}>
@@ -130,7 +128,7 @@ function ImgTile({ file, onRemove }) {
   );
 }
 
-// ─── File attachment row (non-image) ─────────────────────────────────────────
+
 function FileRow({ file, onRemove, onDownload }) {
   const ft = getFileType(file.name);
   return (
@@ -155,9 +153,6 @@ function FileRow({ file, onRemove, onDownload }) {
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// CALENDAR
-// ═══════════════════════════════════════════════════════════════════════════════
 function MiniCalendar({ entries, selected, onSelect }) {
   const today = todayStr();
   const [vy, setVy] = useState(() => new Date().getFullYear());
@@ -188,14 +183,14 @@ function MiniCalendar({ entries, selected, onSelect }) {
         <button onClick={next} style={{ width:30, height:30, borderRadius:8, border:"1.5px solid #e2e8f0", background:"#fff", cursor:"pointer", fontSize:14, color:"#475569", display:"flex", alignItems:"center", justifyContent:"center" }}>›</button>
       </div>
 
-      {/* Day labels */}
+  
       <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:1, marginBottom:6 }}>
         {["M","T","W","T","F","S","S"].map((d,i) => (
           <div key={i} style={{ textAlign:"center", fontSize:9, fontWeight:700, color:"#94a3b8", letterSpacing:".08em", padding:"2px 0" }}>{d}</div>
         ))}
       </div>
 
-      {/* Day cells */}
+  
       <div style={{ display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:2 }}>
         {cells.map((cell, i) => {
           if (!cell) return <div key={`e-${i}`} />;

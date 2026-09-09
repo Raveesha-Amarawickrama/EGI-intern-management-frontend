@@ -7,14 +7,14 @@ import InternLoginPage from "./components/auth/InternLoginPage.jsx";
 import SupervisorLoginPage from "./components/auth/SupervisorLoginPage.jsx";
 import ForcedChangePassword from "./components/auth/ForcedChangePassword.jsx";
 
-// Intern Pages
+
 import { InternDashboard, MyTasksPage } from "./pages/intern/index.jsx";
 import ProfilePage from "./pages/shared/ProfilePage.jsx";
 
 import InternSchedulePage from "./pages/intern/Schedule.jsx";
 
 import DiaryPage from "./pages/shared/DiaryPage.jsx"
-// Supervisor Pages
+
 import {
   SupervisorDashboard,
   AllTasksPage,
@@ -29,7 +29,7 @@ import SupervisorSchedulePage from "./pages/supervisor/Schedule.jsx";
 // Shared Pages
 import SocialPage from "./pages/shared/SocialPage.jsx";
 import FilesPage from "./pages/shared/FilesPage.jsx";
-
+import ThirdPartyItemsPage from "./pages/supervisor/ThirdPartyItemsPage.jsx";
 function LoginChoose({ setView }) {
   return (
     <div className="auth-bg">
@@ -125,7 +125,8 @@ function AppContent() {
         case "social":      return <SocialPage />;
         case "content":     return <SocialPage view="calendar" />;
         case "files":       return <FilesPage />;
-       
+       case "renewals":
+  return isSenior ? <ThirdPartyItemsPage /> : <div>Access Denied</div>;
         case "supervisors": 
           return isSenior ? <SupervisorsPage /> : <div>Access Denied</div>;
         default: 

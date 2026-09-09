@@ -1,4 +1,4 @@
-// pages/supervisor/SocialMedia.jsx
+
 import { useState, useEffect } from "react";
 import { useSocial } from "../../hooks/useSocial";
 import SocialContentModal from "../../components/shared/SocialContentModal";
@@ -59,7 +59,7 @@ export default function SupervisorSocialMedia() {
 
   return (
     <div style={{ fontFamily: "'DM Sans', sans-serif", background: "#F8FAFC", minHeight: "100vh", padding: "24px" }}>
-      {/* Header */}
+    
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
         <div>
           <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: "#0F172A", letterSpacing: "-0.5px" }}>
@@ -81,7 +81,7 @@ export default function SupervisorSocialMedia() {
         </button>
       </div>
 
-      {/* Tabs */}
+   
       <div style={{ display: "flex", gap: 4, marginBottom: 24, background: "#E2E8F0", borderRadius: 10, padding: 4, width: "fit-content" }}>
         {["overview", "content"].map((tab) => (
           <button
@@ -101,10 +101,9 @@ export default function SupervisorSocialMedia() {
         ))}
       </div>
 
-      {/* Overview Tab */}
       {activeTab === "overview" && stats && (
         <>
-          {/* Stats Cards */}
+       
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 16, marginBottom: 28 }}>
             {[
               { label: "Total Content", value: stats.overview.total, color: "#2563EB", bg: "#EFF6FF" },
@@ -123,7 +122,7 @@ export default function SupervisorSocialMedia() {
             ))}
           </div>
 
-          {/* Platform Breakdown */}
+       
           {stats.platformBreakdown?.length > 0 && (
             <div style={{ background: "#fff", borderRadius: 16, padding: 24, border: "1px solid #E2E8F0", marginBottom: 24 }}>
               <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 700, color: "#0F172A" }}>Platform Breakdown</h3>
@@ -142,7 +141,7 @@ export default function SupervisorSocialMedia() {
             </div>
           )}
 
-          {/* Top Performers */}
+      
           {stats.topPerformers?.length > 0 && (
             <div style={{ background: "#fff", borderRadius: 16, padding: 24, border: "1px solid #E2E8F0" }}>
               <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 700, color: "#0F172A" }}>🏆 Top Performers (Last 30 Days)</h3>
@@ -174,7 +173,7 @@ export default function SupervisorSocialMedia() {
         </>
       )}
 
-      {/* Content Tab */}
+    
       {activeTab === "content" && (
         <>
           {/* Filters */}
@@ -202,7 +201,7 @@ export default function SupervisorSocialMedia() {
             </button>
           </div>
 
-          {/* Content Table */}
+       
           {loading ? (
             <div style={{ textAlign: "center", padding: 40, color: "#64748B" }}>Loading...</div>
           ) : (
@@ -289,7 +288,7 @@ export default function SupervisorSocialMedia() {
         </>
       )}
 
-      {/* Modals */}
+  
       {showCreateModal && (
         <SocialContentModal
           users={users}
@@ -311,7 +310,7 @@ export default function SupervisorSocialMedia() {
   );
 }
 
-// Style helpers
+
 const selectStyle = {
   padding: "9px 14px", borderRadius: 9, border: "1.5px solid #E2E8F0",
   fontSize: 13, color: "#475569", background: "#fff", cursor: "pointer",
