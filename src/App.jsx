@@ -30,38 +30,110 @@ import SupervisorSchedulePage from "./pages/supervisor/Schedule.jsx";
 import SocialPage from "./pages/shared/SocialPage.jsx";
 import FilesPage from "./pages/shared/FilesPage.jsx";
 import ThirdPartyItemsPage from "./pages/supervisor/ThirdPartyItemsPage.jsx";
+
+
 function LoginChoose({ setView }) {
   return (
-    <div className="auth-bg">
-      <div className="auth-blob auth-blob--top-right" />
-      <div className="auth-blob auth-blob--bottom-left" />
+    <div className="egi-landing-wrapper">
+      {/* Modern Top Header */}
+      <header className="egi-landing-header">
+        <div className="egi-landing-brand">
+          <svg width="38" height="38" viewBox="0 0 48 48" fill="none" className="egi-landing-brand-svg">
+            <path d="M16 38C12 28 18 16 36 10C36 24 28 36 16 38Z" fill="#0f6240"/>
+            <path d="M16 38C9 30 9 22 14 17C20 20 20 28 16 38Z" fill="#16a34a"/>
+            <path d="M16 38C18 30 24 21 36 10" stroke="#a7f3d0" strokeWidth="1.6" strokeLinecap="round"/>
+          </svg>
+          <div className="egi-landing-brand-text">
+            <span className="egi-landing-brand-title">ECO GREEN</span>
+            <span className="egi-landing-brand-sub">INTERNATIONAL</span>
+          </div>
+        </div>
+        <div className="egi-landing-tagline">
+          Green Solutions &nbsp;|&nbsp; Sustainable Future
+        </div>
+      </header>
 
-      <div className="auth-logo-wrap">
-        <div className="auth-company">Eco Green International</div>
-        <div className="auth-tagline">Intern Training Programme 2025 / 2026</div>
-      </div>
-
-      <div style={{ display: "flex", gap: 20, zIndex: 1, flexWrap: "wrap", justifyContent: "center" }}>
-        <div className="auth-choose-card auth-choose-card--intern" onClick={() => setView("intern")}>
-          <div className="auth-choose-card__icon">👨‍💻</div>
-          <h2 className="auth-choose-card__title">Intern</h2>
-          <p className="auth-choose-card__desc">
-            Access your internship tasks, track hours and view your progress.
+      {/* Main Hero & Portal Cards */}
+      <main className="egi-landing-content">
+        <div className="egi-hero-title-box">
+          <div className="egi-hero-accent-bar" />
+          <h1 className="egi-hero-heading">Eco Green International</h1>
+          <h2 className="egi-hero-subtitle">Intern Management Portal</h2>
+          <p className="egi-hero-desc">
+            Manage internship activities, tasks, work logs and performance.
           </p>
-          <span className="auth-choose-card__cta auth-choose-card__cta--intern">Sign In →</span>
         </div>
 
-        <div className="auth-choose-card auth-choose-card--supervisor" onClick={() => setView("supervisor")}>
-          <div className="auth-choose-card__icon">👔</div>
-          <h2 className="auth-choose-card__title auth-choose-card__title--supervisor">Supervisor</h2>
-          <p className="auth-choose-card__desc">
-            Manage interns, assign tasks and view performance reports.
-          </p>
-          <span className="auth-choose-card__cta auth-choose-card__cta--supervisor">Sign In →</span>
-        </div>
-      </div>
+        <div className="egi-portal-cards-row">
+          {/* Intern Portal Card */}
+          <div className="egi-portal-card egi-portal-card--intern" onClick={() => setView("intern")}>
+            <div className="egi-portal-icon-wrap egi-portal-icon-wrap--intern">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+              </svg>
+            </div>
+            <h3 className="egi-portal-card-title">Intern Portal</h3>
+            <p className="egi-portal-card-desc">
+              View your assigned tasks, submit work logs and track your progress.
+            </p>
+            <button className="egi-portal-btn egi-portal-btn--intern">
+              Continue as Intern →
+            </button>
+            <svg className="egi-portal-leaf-watermark" viewBox="0 0 120 120" fill="none">
+              <path d="M42 115C32 80 48 45 98 25C98 65 78 100 42 115Z" fill="#a7f3d0" fillOpacity="0.5"/>
+              <path d="M42 115C22 90 22 65 37 50C52 60 52 85 42 115Z" fill="#6ee7b7" fillOpacity="0.4"/>
+            </svg>
+          </div>
 
-      <p className="auth-footer">© 2026 Eco Green International Pvt Ltd</p>
+          {/* Supervisor Portal Card */}
+          <div className="egi-portal-card egi-portal-card--supervisor" onClick={() => setView("supervisor")}>
+            <div className="egi-portal-icon-wrap egi-portal-icon-wrap--supervisor">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <circle cx="19" cy="11" r="2"/>
+                <path d="M19 8v1"/>
+                <path d="M19 13v1"/>
+                <path d="M16.5 9.5l.8.5"/>
+                <path d="M20.7 12l.8.5"/>
+                <path d="M16.5 12.5l.8-.5"/>
+                <path d="M20.7 10l.8-.5"/>
+              </svg>
+            </div>
+            <h3 className="egi-portal-card-title">Supervisor Portal</h3>
+            <p className="egi-portal-card-desc">
+              Manage interns, assign tasks and view performance reports.
+            </p>
+            <button className="egi-portal-btn egi-portal-btn--supervisor">
+              Continue as Supervisor →
+            </button>
+            <svg className="egi-portal-leaf-watermark" viewBox="0 0 120 120" fill="none">
+              <path d="M42 115C32 80 48 45 98 25C98 65 78 100 42 115Z" fill="#fde68a" fillOpacity="0.55"/>
+              <path d="M42 115C22 90 22 65 37 50C52 60 52 85 42 115Z" fill="#fcd34d" fillOpacity="0.4"/>
+            </svg>
+          </div>
+        </div>
+      </main>
+
+      {/* Modern Footer Bar */}
+      <footer className="egi-landing-footer">
+        <div className="egi-landing-footer-left">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          <span>Secure Internal Portal</span>
+        </div>
+        <div className="egi-landing-footer-center">
+          © 2026 Eco Green International Pvt Ltd
+        </div>
+        <div className="egi-landing-footer-right">
+          <span>Privacy Policy</span>
+          <span>&nbsp;|&nbsp;</span>
+          <span>Support</span>
+        </div>
+      </footer>
     </div>
   );
 }
@@ -99,14 +171,13 @@ function AppContent() {
     if (user.role === "intern") {
       switch (page) {
          case "diary": return <DiaryPage />;
-        case "dashboard": return <InternDashboard />;
+        case "dashboard": return <InternDashboard setPage={setPage} />;
         case "mytasks":   return <MyTasksPage />;
         case "profile":   return <ProfilePage />;
        
         case "schedule":  return <InternSchedulePage />;
         case "social":    return <SocialPage />;
         case "files":     return <FilesPage />;
-        case "diary": return <DiaryPage />;
         default:          return <div style={{ padding: 40 }}>Page not found</div>;
       }
     }
@@ -114,7 +185,7 @@ function AppContent() {
     if (user.role === "supervisor") {
       switch (page) {
          case "diary": return <DiaryPage />;
-        case "dashboard":   return <SupervisorDashboard />;
+        case "dashboard":   return <SupervisorDashboard setPage={setPage} />;
         case "tasks":       return <AllTasksPage />;
         case "mytasks":     return <MyTasksPageSupervisor />;
         case "profile":     return <ProfilePage />;   

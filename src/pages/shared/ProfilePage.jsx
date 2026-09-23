@@ -3,6 +3,15 @@ import { userAPI } from "../../utils/api";
 import { Avatar, Toast } from "../../components/shared/index.jsx";
 import { useAuth } from "../../hooks/useAuth";
 import { formatMinutes } from "../../utils/helpers";
+import {
+  CheckCircleIcon,
+  ClipboardIcon,
+  ClockIcon,
+  TrendingUpIcon,
+  UserIcon,
+  EditIcon,
+  LeafIcon,
+} from "../../components/shared/Icons.jsx";
 import Field from "../../components/shared/forms/Field.jsx";
 import FamilyDetailsSection from "../../components/profile/FamilyDetailsSection.jsx";
 import DocumentsSection from "../../components/profile/DocumentsSection.jsx";
@@ -154,7 +163,12 @@ export default function ProfilePage() {
                     fontSize: 12, boxShadow: "0 2px 6px rgba(0,0,0,.25)",
                   }}
                 >
-                  {uploadingPic ? "…" : "📷"}
+                  {uploadingPic ? "…" : (
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                      <circle cx="12" cy="13" r="4"/>
+                    </svg>
+                  )}
                 </button>
               </div>
               <div>
@@ -162,8 +176,10 @@ export default function ProfilePage() {
                 <p style={{ fontSize: 13, color: "var(--green-600)", fontWeight: 600, marginTop: 4 }}>{user.position || roleLabel}</p>
                 <p style={{ fontSize: 13, color: "var(--gray-500)", marginTop: 2 }}>{user.department}</p>
                 <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap", alignItems: "center" }}>
-                  <span className="chip">🌿 Eco Green International</span>
-                  <span className="chip">{user.role === "intern" ? "👨‍💻 Intern Trainee" : `👔 ${roleLabel}`}</span>
+                  <span className="chip" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                    <LeafIcon size={13} color="var(--egi-green)" /> Eco Green International
+                  </span>
+                  <span className="chip">{user.role === "intern" ? "Intern Trainee" : roleLabel}</span>
                   {user.profilePicture && (
                     <button
                       onClick={handleRemovePhoto}
@@ -177,7 +193,9 @@ export default function ProfilePage() {
               </div>
             </div>
             {!editing ? (
-              <button className="btn btn-primary" onClick={() => setEditing(true)}>✏️ Edit Profile</button>
+              <button className="btn btn-primary" onClick={() => setEditing(true)} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                <EditIcon size={14} color="#fff" /> Edit Profile
+              </button>
             ) : (
               <div style={{ display: "flex", gap: 8 }}>
                 <button className="btn btn-secondary" onClick={handleCancel} disabled={saving}>Cancel</button>
@@ -194,10 +212,10 @@ export default function ProfilePage() {
       {stats && (
         <div className="grid-4 mb-24">
           {[
-            ["✅", "Completed",  stats.done,                    "stat-green"],
-            ["📋", "Total Tasks", stats.total,                  "stat-blue"],
-            ["⏱",  "Hours Logged", formatMinutes(stats.totalMins), "stat-gold"],
-            ["📈", "Completion",  stats.pct + "%",              "stat-purple"],
+            [<CheckCircleIcon size={22} color="#166534" />, "Completed",  stats.done,                    "stat-green"],
+            [<ClipboardIcon size={22} color="#1d4ed8" />, "Total Tasks", stats.total,                  "stat-blue"],
+            [<ClockIcon size={22} color="#b45309" />,  "Hours Logged", formatMinutes(stats.totalMins), "stat-gold"],
+            [<TrendingUpIcon size={22} color="#7c3aed" />, "Completion",  stats.pct + "%",              "stat-purple"],
           ].map(([icon, label, val, cls]) => (
             <div key={label} className={`stat-card ${cls}`}>
               <div className="stat-icon">{icon}</div>
@@ -208,9 +226,13 @@ export default function ProfilePage() {
         </div>
       )}
 
-    
+   
       <div className="card mb-24">
-        <div className="card-header"><div className="card-title">👤 Basic Details</div></div>
+        <div className="card-header">
+          <div className="card-title" style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+            <UserIcon size={16} color="var(--egi-green)" /> Basic Details
+          </div>
+        </div>
         <div className="card-body">
           {!editing ? (
             <div className="profile-info-grid">

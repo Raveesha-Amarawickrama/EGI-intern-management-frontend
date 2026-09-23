@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { CheckCircleIcon, TrashIcon, FolderIcon } from "../../components/shared/Icons.jsx";
 
 
 const DIARY_KEY = "egi_diary_v2";
@@ -413,7 +414,7 @@ function EntryCard({ entry, onEdit, onDelete, isActive, onClick }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 function EntryEditor({ entry, onSave, onClose }) {
   const [form, setForm] = useState({
-    date: todayStr(), title:"", content:"", tags:[], mood:"", attachments:[],
+    date: todayStr(), title:"", content:"", tags:[], mood:"",
     ...entry,
     attachments: [...(entry?.attachments||[]), ...(entry?.images||[])],
   });
@@ -598,7 +599,9 @@ function EntryEditor({ entry, onSave, onClose }) {
                 marginBottom: form.attachments.length > 0 ? 14 : 0,
               }}
             >
-              <div style={{ fontSize:28, marginBottom:6 }}>📂</div>
+              <div style={{ marginBottom:8, display:"flex", justifyContent:"center" }}>
+                <FolderIcon size={32} color={dragOver ? "#16a34a" : "#64748b"} />
+              </div>
               <div style={{ fontSize:13, fontWeight:600, color: dragOver ? "#16a34a" : "#475569" }}>
                 {dragOver ? "Release to attach files" : "Click to browse or drag & drop"}
               </div>
@@ -647,7 +650,7 @@ function EntryEditor({ entry, onSave, onClose }) {
             boxShadow:"0 4px 14px rgba(22,163,74,.3)",
             transition:"all .15s",
           }}>
-            {saving ? "Saving…" : entry?.id ? "💾 Save Changes" : "✨ Save Entry"}
+            {saving ? "Saving…" : entry?.id ? "Save Changes" : "Save Entry"}
           </button>
         </div>
       </div>
@@ -661,7 +664,7 @@ function EntryEditor({ entry, onSave, onClose }) {
 function EntryDetail({ entry, onEdit, onDelete }) {
   if (!entry) return (
     <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", height:"100%", minHeight:320, color:"#94a3b8" }}>
-      <div style={{ fontSize:48, marginBottom:14, opacity:.4 }}>📓</div>
+      <div style={{ marginBottom:14, opacity:.4 }}><FolderIcon size={44} color="#94a3b8" /></div>
       <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:18, color:"#cbd5e1", marginBottom:6 }}>No entry selected</div>
       <div style={{ fontSize:13, color:"#94a3b8" }}>Click a date on the calendar or an entry in the list</div>
     </div>
@@ -905,7 +908,7 @@ export function DiaryPage() {
             animation:"slideUp .3s ease",
             display:"flex", alignItems:"center", gap:8,
           }}>
-            {toast.ok ? "✅" : "🗑️"} {toast.msg}
+            {toast.ok ? <CheckCircleIcon size={16} color="#fff" /> : <TrashIcon size={16} color="#fff" />} {toast.msg}
           </div>
         )}
 
@@ -913,7 +916,7 @@ export function DiaryPage() {
         {deleteId && (
           <div style={{ position:"fixed", inset:0, background:"rgba(15,23,42,.6)", backdropFilter:"blur(4px)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:9999 }}>
             <div style={{ background:"#fff", borderRadius:20, padding:"32px 28px", maxWidth:380, width:"100%", boxShadow:"0 40px 100px rgba(0,0,0,.25)", textAlign:"center" }}>
-              <div style={{ fontSize:40, marginBottom:12 }}>🗑️</div>
+              <div style={{ marginBottom:14, display:"flex", justifyContent:"center" }}><TrashIcon size={40} color="#e11d48" /></div>
               <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:20, color:"#0f172a", marginBottom:8 }}>Delete this entry?</div>
               <p style={{ fontSize:13, color:"#64748b", marginBottom:24, lineHeight:1.6 }}>This diary entry and all its attachments will be permanently removed. This action cannot be undone.</p>
               <div style={{ display:"flex", gap:10, justifyContent:"center" }}>
@@ -940,7 +943,7 @@ export function DiaryPage() {
             </div>
           </div>
           <button className="new-entry-btn" onClick={openNew}>
-            <span style={{ fontSize:16 }}>✨</span> New Entry
+            + New Entry
           </button>
         </div>
 

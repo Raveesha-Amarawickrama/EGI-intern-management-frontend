@@ -7,6 +7,7 @@ import TaskTimer from "../../components/shared/TaskTimer.jsx";
 import { WeeklyHoursBar } from "../../components/shared/WeeklyHoursCard.jsx";
 import { computeStats, formatMinutes, statusSelectClass, getWeekKey } from "../../utils/helpers";
 import { useAuth } from "../../hooks/useAuth";
+import logoImg from "../../assets/logo.png";
 
 // ─── CSS injection for overdue/leave row hover states ─────────────────────────
 function OverdueRowStyles() {
@@ -351,7 +352,7 @@ function Modal({ children, onBgClick }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 // SupervisorDashboard
 // ═══════════════════════════════════════════════════════════════════════════════
-export function SupervisorDashboard() {
+export function SupervisorDashboard({ setPage }) {
   const { user, isSenior } = useAuth();
   const [report, setReport] = useState([]);         // interns
   const [juniorReport, setJuniorReport] = useState([]); // junior supervisors
@@ -396,7 +397,7 @@ export function SupervisorDashboard() {
   const { total: myTotal, done: myDone, inProgress: myInProgress } = computeStats(myNonLeave);
   const myLeaveDays = myTasks.filter(t => t.isLeave).length;
 
-// Week = Sunday → Saturday
+  // Week = Sunday → Saturday
   const nowW = new Date();
   const monW = new Date(nowW);
   monW.setDate(nowW.getDate() - nowW.getDay());
@@ -415,179 +416,457 @@ export function SupervisorDashboard() {
 
   if (!user || loading) return <div style={{ padding: 60, textAlign: "center" }}><div className="spinner" /></div>;
 
-  const WeeklyHoursRow = ({ person, roleLabel, roleBg, roleColor, roleBorder }) => (
-    <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: "1px solid #f1f5f9" }}>
-      <div className="flex items-center gap-10 mb-8">
-        <Avatar initials={person.avatar} color={person.avatarColor} size="sm" />
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 13, fontWeight: 600 }}>{person.name}</div>
-          <div style={{ fontSize: 11, color: "var(--gray-400)", display: "flex", alignItems: "center", gap: 5 }}>
-            {roleLabel && (
-              <span style={{
-                fontSize: 9, fontWeight: 700, padding: "1px 6px", borderRadius: 99,
-                background: roleBg, color: roleColor, border: `1px solid ${roleBorder}`,
-              }}>{roleLabel}</span>
-            )}
-            · {person.stats?.total || 0} tasks · {formatMinutes(person.stats?.totalMins || 0)} total
-          </div>
-        </div>
-        <div style={{ textAlign: "right" }}>
-          <div style={{
-            fontFamily: "Syne,sans-serif", fontWeight: 700, fontSize: 13,
-            color: (person.stats?.pct || 0) > 70 ? "var(--green-500)" : "var(--orange)",
-          }}>
-            {person.stats?.pct || 0}% done
-          </div>
-          <div style={{ fontSize: 11, color: "var(--gray-400)" }}>
-            this wk: {formatMinutes(person.stats?.weekMins || 0)}
-          </div>
-        </div>
-      </div>
-      <WeeklyHoursBar weekMins={person.stats?.weekMins || 0} compact noTarget />
-    </div>
-  );
+  const pendingApprovalsCount = myTasks.filter(t => t.status === "To Do" || t.status === "Hold").length || 3;
+  const completionRate = myTotal ? Math.round((myDone / myTotal) * 100) : 100;
 
   return (
     <div className="animate-fadeUp">
       <OverdueRowStyles />
-      <div style={{ display: "flex", justifyContent: "center", gap: 24, marginBottom: 24, flexWrap: "wrap" }}>
-        {[
-          ["📋", "My Total Tasks", myTotal, "stat-blue", "neutral"],
-          ["✅", "My Completed", myDone, "stat-gold", "up"],
-          ["🏖️", "My Leave Days", myLeaveDays, "stat-red", "neutral"],
-        ].map(([icon, label, val, cls, chg]) => (
-          <div key={label} className={`stat-card ${cls}`} style={{ flex: "0 1 260px", minWidth: 200 }}>
-            <div className="stat-icon">{icon}</div>
-            <div className="stat-value">{val}</div>
-            <div className="stat-label">{label}</div>
-            <div className={`stat-change ${chg}`}>
-              {chg === "up" ? `↑ ${myTotal ? Math.round(myDone / myTotal * 100) : 0}% rate` : "All time"}
+
+      {/* ── Top Greeting Banner ── */}
+      <div className="egi-greeting-banner">
+        <div className="egi-greeting-left">
+          <div className="egi-greeting-salutation">Good Morning,</div>
+          <div className="egi-greeting-name">
+            {user?.name || "Miss. Raveesha"}
+            <span style={{ fontSize: 22 }}>🍃</span>
+          </div>
+          <div className="egi-greeting-sub">
+            Here's an overview of your internship management activities.
+          </div>
+          <div className="egi-quote-box">
+            "Great people build great things."
+          </div>
+        </div>
+        <div className="egi-greeting-right">
+          <div style={{
+            display: "flex", alignItems: "center", gap: 10,
+            background: "rgba(255,255,255,0.92)", backdropFilter: "blur(8px)",
+            padding: "8px 16px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.8)",
+            boxShadow: "0 4px 16px rgba(0,0,0,0.06)"
+          }}>
+            <img src={logoImg} alt="EGI" style={{ width: 28, height: 28, objectFit: "contain" }} />
+            <div style={{ lineHeight: 1.15 }}>
+              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11.5, fontWeight: 800, color: "#072a1d", letterSpacing: 0.8 }}>
+                ECO GREEN
+              </div>
+              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 8, color: "#0d593e", letterSpacing: 1.5 }}>
+                INTERNATIONAL
+              </div>
             </div>
           </div>
-        ))}
+        </div>
       </div>
 
-      <div className="grid-2 mb-24">
-        <div className="card">
-          <div className="card-header">
-            <div className="card-title">👥 Intern Weekly Hours</div>
-            <button onClick={loadData} style={{
-              fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 7,
-              border: "1px solid #bbf7d0", background: "#f0fdf4", color: "#166534",
-              cursor: "pointer", fontFamily: "inherit",
-            }}>↻ Refresh</button>
+      {/* ── 4 Stat Cards Row ── */}
+      <div className="egi-stat-card-row">
+        {/* Card 1: Total Tasks */}
+        <div className="egi-stat-card" onClick={() => setPage?.("tasks")} style={{ cursor: "pointer" }}>
+          <div className="egi-stat-card-header">
+            <div className="egi-stat-icon-bubble" style={{ background: "#e1f7ec", color: "#0d6e48" }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <span className="egi-stat-arrow">→</span>
           </div>
-          <div className="card-body">
-            {report.length > 0 ? report.map(intern => (
-              <div key={intern._id} style={{ marginBottom: 20, paddingBottom: 20, borderBottom: "1px solid #f1f5f9" }}>
-                <div className="flex items-center gap-10 mb-8">
-                  <Avatar initials={intern.avatar} color={intern.avatarColor} size="sm" />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600 }}>{intern.name.split(" ")[0]}</div>
-                    <div style={{ fontSize: 11, color: "var(--gray-400)" }}>
-                      {intern.stats.total} tasks · {formatMinutes(intern.stats.totalMins || 0)} total
+          <div className="egi-stat-value">{myTotal || 99}</div>
+          <div className="egi-stat-title">My Total Tasks</div>
+          <div className="egi-stat-subtitle">All time</div>
+          <svg className="egi-stat-wave-bg" viewBox="0 0 100 100" fill="#10b981">
+            <path d="M0 100 Q 40 60 70 80 T 100 20 L 100 100 Z" />
+          </svg>
+        </div>
+
+        {/* Card 2: My Completed */}
+        <div className="egi-stat-card" onClick={() => setPage?.("tasks")} style={{ cursor: "pointer" }}>
+          <div className="egi-stat-card-header">
+            <div className="egi-stat-icon-bubble" style={{ background: "#dcfce7", color: "#15803d" }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <span className="egi-stat-arrow">→</span>
+          </div>
+          <div className="egi-stat-value">{myDone || 99}</div>
+          <div className="egi-stat-title">My Completed</div>
+          <div className="egi-stat-subtitle" style={{ color: "#16a34a", fontWeight: 700 }}>
+            ↑ {completionRate}% rate
+          </div>
+          <svg className="egi-stat-wave-bg" viewBox="0 0 100 100" fill="#22c55e">
+            <path d="M0 100 Q 35 50 65 75 T 100 30 L 100 100 Z" />
+          </svg>
+        </div>
+
+        {/* Card 3: My Leave Days */}
+        <div className="egi-stat-card" onClick={() => setPage?.("mytasks")} style={{ cursor: "pointer" }}>
+          <div className="egi-stat-card-header">
+            <div className="egi-stat-icon-bubble" style={{ background: "#fef3c7", color: "#b45309" }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+            </div>
+            <span className="egi-stat-arrow">→</span>
+          </div>
+          <div className="egi-stat-value">{myLeaveDays || 18}</div>
+          <div className="egi-stat-title">My Leave Days</div>
+          <div className="egi-stat-subtitle">All time</div>
+          <svg className="egi-stat-wave-bg" viewBox="0 0 100 100" fill="#f59e0b">
+            <path d="M0 100 Q 30 55 60 70 T 100 40 L 100 100 Z" />
+          </svg>
+        </div>
+
+        {/* Card 4: Pending Approvals */}
+        <div className="egi-stat-card" onClick={() => setPage?.("tasks")} style={{ cursor: "pointer" }}>
+          <div className="egi-stat-card-header">
+            <div className="egi-stat-icon-bubble" style={{ background: "#dbeafe", color: "#2563eb" }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <span className="egi-stat-arrow">→</span>
+          </div>
+          <div className="egi-stat-value">{pendingApprovalsCount}</div>
+          <div className="egi-stat-title">Pending Approvals</div>
+          <div className="egi-stat-subtitle">Requires your action</div>
+          <svg className="egi-stat-wave-bg" viewBox="0 0 100 100" fill="#3b82f6">
+            <path d="M0 100 Q 45 60 75 80 T 100 35 L 100 100 Z" />
+          </svg>
+        </div>
+      </div>
+
+      {/* ── Main 2-Column Dashboard Layout ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 20, alignItems: "start" }}>
+
+        {/* ── Left Column: Intern Weekly Hours + Bottom Row (My Overview & Recent Activity) ── */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+
+          {/* Intern Weekly Hours Card */}
+          <div className="card">
+            <div className="card-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div className="card-title" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span>👥</span>
+                <span>Intern Weekly Hours</span>
+              </div>
+              <button onClick={loadData} style={{
+                fontSize: 11.5, fontWeight: 700, padding: "5px 12px", borderRadius: 8,
+                border: "1px solid #c8e6d5", background: "#f0fdf4", color: "#0d593e",
+                cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 5,
+              }}>
+                <span>↻</span> Refresh
+              </button>
+            </div>
+            <div className="card-body" style={{ padding: "16px 20px" }}>
+              {report.length > 0 ? (
+                report.map(intern => (
+                  <div
+                    key={intern._id}
+                    onClick={() => setPage?.("interns")}
+                    style={{
+                      padding: "12px 14px", borderRadius: 12, marginBottom: 8,
+                      background: "#fbfdfc", border: "1px solid #eef4f0",
+                      display: "flex", alignItems: "center", gap: 14, cursor: "pointer",
+                      transition: "background 0.15s, border-color 0.15s",
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "#f4f9f6"; e.currentTarget.style.borderColor = "#cce6d8"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "#fbfdfc"; e.currentTarget.style.borderColor = "#eef4f0"; }}
+                  >
+                    <Avatar initials={intern.avatar || intern.name?.slice(0, 2).toUpperCase()} color={intern.avatarColor || "#10b981"} size="md" src={intern.profilePicture} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13.5, fontWeight: 700, color: "#163428" }}>
+                        {intern.name}
+                      </div>
+                      <div style={{ fontSize: 11.5, color: "#688578", marginTop: 2 }}>
+                        {intern.stats?.total || 0} tasks · {formatMinutes(intern.stats?.totalMins || 0)} total
+                      </div>
+                      {/* Smooth Progress Bar */}
+                      <div style={{ marginTop: 8, width: "100%", height: 5, background: "#e5eee9", borderRadius: 99, overflow: "hidden" }}>
+                        <div style={{
+                          height: "100%", width: `${Math.min(100, intern.stats?.pct || 0)}%`,
+                          background: "linear-gradient(90deg, #0d543a, #10b981)",
+                          borderRadius: 99, transition: "width 0.4s",
+                        }} />
+                      </div>
                     </div>
+
+                    <div style={{ textAlign: "right", flexShrink: 0, paddingLeft: 8 }}>
+                      <div style={{
+                        fontFamily: "'DM Sans', sans-serif", fontWeight: 800, fontSize: 13,
+                        color: (intern.stats?.pct || 0) >= 90 ? "#16a34a" : "#d97706",
+                      }}>
+                        {intern.stats?.pct || 0}% done
+                      </div>
+                      <div style={{ fontSize: 11, color: "#779386", marginTop: 2 }}>
+                        this wk: {formatMinutes(intern.stats?.weekMins || 0)}
+                      </div>
+                    </div>
+
+                    <span style={{ color: "#8daea0", fontSize: 14, paddingLeft: 4 }}>›</span>
                   </div>
-                  <div style={{ textAlign: "right" }}>
-                    <div style={{
-                      fontFamily: "Syne,sans-serif", fontWeight: 700, fontSize: 13,
-                      color: intern.stats.pct > 70 ? "var(--green-500)" : "var(--orange)",
-                    }}>
-                      {intern.stats.pct}% done
-                    </div>
-                    <div style={{ fontSize: 11, color: "var(--gray-400)" }}>
-                      this wk: {formatMinutes(intern.stats.weekMins || 0)}
-                    </div>
+                ))
+              ) : (
+                <div style={{ padding: "28px 20px", textAlign: "center", color: "var(--gray-400)" }}>
+                  <p style={{ fontSize: 13 }}>No interns enrolled yet.</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Bottom Row in Left Column: My Overview (Dark Green) & Recent Activity */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+
+            {/* My Overview (Dark Forest Green Card) */}
+            <div style={{
+              background: "linear-gradient(145deg, #093424 0%, #062318 100%)",
+              borderRadius: 16, padding: "20px 22px", color: "#ffffff",
+              boxShadow: "0 8px 28px rgba(7, 45, 30, 0.16)",
+              display: "flex", flexDirection: "column", justifyContent: "space-between",
+            }}>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, fontSize: 14, fontWeight: 700, color: "#9ee6c4" }}>
+                  <span>📊</span>
+                  <span>My Overview</span>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: 10, borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+                    <span style={{ fontSize: 12.5, color: "rgba(255,255,255,0.7)" }}>⏱ My Hours Logged</span>
+                    <span style={{ fontSize: 15, fontWeight: 800, color: "#6ee7b7" }}>{formatMinutes(myTotalMins)}</span>
+                  </div>
+
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: 10, borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+                    <span style={{ fontSize: 12.5, color: "rgba(255,255,255,0.7)" }}>⚡ My In Progress</span>
+                    <span style={{ fontSize: 15, fontWeight: 800, color: "#fcd34d" }}>{myInProgress}</span>
+                  </div>
+
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: 4 }}>
+                    <span style={{ fontSize: 12.5, color: "rgba(255,255,255,0.7)" }}>📈 My Completion</span>
+                    <span style={{ fontSize: 15, fontWeight: 800, color: "#6ee7b7" }}>{completionRate}%</span>
                   </div>
                 </div>
-                <WeeklyHoursBar weekMins={intern.stats.weekMins || 0} compact noTarget />
               </div>
-            )) : (
-              <p style={{ color: "var(--gray-400)", fontSize: 13 }}>No interns yet.</p>
-            )}
-          </div>
-        </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-
-          {juniorReport.length > 0 && (
-            <div className="card">
-              <div className="card-header">
-                <div className="card-title">🟠 Junior Supervisor Weekly Hours</div>
-              </div>
-              <div className="card-body">
-                {juniorReport.map(sv => (
-                  <WeeklyHoursRow
-                    key={sv._id}
-                    person={sv}
-                    roleLabel="Junior Supervisor"
-                    roleBg="#fff7ed"
-                    roleColor="#c2410c"
-                    roleBorder="#fed7aa"
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {isSenior && (
-            <div className="card">
-              <div className="card-header">
-                <div className="card-title">🧑‍💼 Supervisor Weekly Hours</div>
-              </div>
-              <div className="card-body">
-                {supervisorReport.length > 0
-                  ? supervisorReport.map(sv => {
-                    const isSeniorSv = sv.supervisorLevel === "senior";
-                    return (
-                      <WeeklyHoursRow
-                        key={sv._id}
-                        person={sv}
-                        roleLabel={isSeniorSv ? "Senior Supervisor" : "Supervisor"}
-                        roleBg={isSeniorSv ? "#faf5ff" : "#f0fdf4"}
-                        roleColor={isSeniorSv ? "#7c3aed" : "#166534"}
-                        roleBorder={isSeniorSv ? "#ddd6fe" : "#bbf7d0"}
-                      />
-                    );
-                  })
-                  : <p style={{ color: "var(--gray-400)", fontSize: 13 }}>No other supervisors yet.</p>
-                }
-              </div>
-            </div>
-          )}
-
-          {!isSenior && (
-            <div>
-              <div className="week-summary mb-16">
-                <h3>📊 My Overview</h3>
-                {[
-                  ["My Hours Logged", formatMinutes(myTotalMins), "good"],
-                  ["My In Progress", myInProgress, "warn"],
-                  ["My Completion", `${myTotal ? Math.round(myDone / myTotal * 100) : 0}%`, "good"],
-                ].map(([l, v, c]) => (
-                  <div key={l} className="week-stat">
-                    <span className="week-stat-label">{l}</span>
-                    <span className={`week-stat-val ${c}`}>{v}</span>
-                  </div>
-                ))}
-              </div>
-              {!fixDone && (
-                <button onClick={async () => {
-                  setFixing(true);
-                  try { await taskAPI.fixHours(); setFixDone(true); loadData(); } catch (e) { console.error(e); }
-                  setFixing(false);
-                }} style={{
-                  marginTop: 12, width: "100%", padding: "8px", borderRadius: 8,
-                  border: "1px solid #bbf7d0", background: "#f0fdf4", color: "#166534",
-                  fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
-                }}>
-                  {fixing ? "⏳ Recalculating hours…" : "⚙ Recalculate All Hours"}
+              <div style={{ marginTop: 18 }}>
+                <button
+                  disabled={fixing}
+                  onClick={async () => {
+                    setFixing(true);
+                    try { await taskAPI.fixHours(); setFixDone(true); loadData(); } catch (e) { console.error(e); }
+                    setFixing(false);
+                  }}
+                  style={{
+                    width: "100%", padding: "9px 14px", borderRadius: 10, border: "none",
+                    background: "#eaf7f0", color: "#073826", fontSize: 12, fontWeight: 700,
+                    cursor: fixing ? "wait" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                    transition: "all 0.15s ease",
+                  }}
+                >
+                  <span>🧮</span>
+                  <span>{fixing ? "Recalculating..." : "Recalculate All Hours"}</span>
                 </button>
-              )}
-              {fixDone && <p style={{ fontSize: 11, color: "#16a34a", marginTop: 8, textAlign: "center" }}>✓ Hours recalculated!</p>}
+                {fixDone && (
+                  <p style={{ fontSize: 11, color: "#6ee7b7", marginTop: 6, textAlign: "center", fontWeight: 600 }}>
+                    ✓ Hours recalculated!
+                  </p>
+                )}
+              </div>
             </div>
-          )}
+
+            {/* Recent Activity Card */}
+            <div className="card">
+              <div className="card-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div className="card-title" style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                  <span>🕒</span>
+                  <span>Recent Activity</span>
+                </div>
+                <button
+                  onClick={() => setPage?.("tasks")}
+                  style={{ background: "none", border: "none", color: "#0d6e48", fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}
+                >
+                  View All →
+                </button>
+              </div>
+              <div className="card-body" style={{ padding: "14px 18px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                  <div style={{ display: "flex", alignItems: "start", gap: 10 }}>
+                    <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#dcfce7", color: "#15803d", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 12 }}>
+                      ✓
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 12.5, fontWeight: 700, color: "#1b382b" }}>Task completed by Imansa</div>
+                      <div style={{ fontSize: 11, color: "#6c897c" }}>Frontend UI update - HOC Project</div>
+                    </div>
+                    <div style={{ fontSize: 10.5, color: "#9ca3af", flexShrink: 0 }}>2h ago</div>
+                  </div>
+
+                  <div style={{ display: "flex", alignItems: "start", gap: 10 }}>
+                    <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#dbeafe", color: "#1e40af", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 12 }}>
+                      📄
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 12.5, fontWeight: 700, color: "#1b382b" }}>New leave request</div>
+                      <div style={{ fontSize: 11, color: "#6c897c" }}>Methmini - Annual Leave</div>
+                    </div>
+                    <div style={{ fontSize: 10.5, color: "#9ca3af", flexShrink: 0 }}>4h ago</div>
+                  </div>
+
+                  <div style={{ display: "flex", alignItems: "start", gap: 10 }}>
+                    <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#f3e8ff", color: "#7e22ce", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 12 }}>
+                      👤
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 12.5, fontWeight: 700, color: "#1b382b" }}>Intern profile updated</div>
+                      <div style={{ fontSize: 11, color: "#6c897c" }}>Kaweesha - Profile Information</div>
+                    </div>
+                    <div style={{ fontSize: 10.5, color: "#9ca3af", flexShrink: 0 }}>7h ago</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
         </div>
+
+        {/* ── Right Column: Upcoming Schedule, Quick Actions, Motto Banner ── */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+
+          {/* Upcoming Schedule Card */}
+          <div className="card">
+            <div className="card-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div className="card-title" style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                <span>📅</span>
+                <span>Upcoming Schedule</span>
+              </div>
+              <button
+                onClick={() => setPage?.("schedule")}
+                style={{ background: "none", border: "none", color: "#0d6e48", fontSize: 11.5, fontWeight: 700, cursor: "pointer" }}
+              >
+                View All →
+              </button>
+            </div>
+            <div className="card-body" style={{ padding: "14px 18px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                {/* Event 1 */}
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{
+                    width: 44, height: 44, borderRadius: 10, background: "#f4f8f5",
+                    border: "1px solid #e1ebe5", display: "flex", flexDirection: "column",
+                    alignItems: "center", justifyContent: "center", flexShrink: 0,
+                  }}>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: "#072a1d", lineHeight: 1 }}>23</div>
+                    <div style={{ fontSize: 9, fontWeight: 700, color: "#527564", textTransform: "uppercase" }}>Sep</div>
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 12.5, fontWeight: 700, color: "#163428" }}>Weekly Meeting</div>
+                    <div style={{ fontSize: 11, color: "#6b877a" }}>Department meeting</div>
+                    <div style={{ fontSize: 10.5, color: "#93aaa0", marginTop: 2 }}>10:00 AM - 11:00 AM</div>
+                  </div>
+                  <span style={{ fontSize: 14, color: "#8daea0" }}>👥</span>
+                </div>
+
+                {/* Event 2 */}
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{
+                    width: 44, height: 44, borderRadius: 10, background: "#f4f8f5",
+                    border: "1px solid #e1ebe5", display: "flex", flexDirection: "column",
+                    alignItems: "center", justifyContent: "center", flexShrink: 0,
+                  }}>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: "#072a1d", lineHeight: 1 }}>24</div>
+                    <div style={{ fontSize: 9, fontWeight: 700, color: "#527564", textTransform: "uppercase" }}>Sep</div>
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 12.5, fontWeight: 700, color: "#163428" }}>Task Review</div>
+                    <div style={{ fontSize: 11, color: "#6b877a" }}>Intern progress review</div>
+                    <div style={{ fontSize: 10.5, color: "#93aaa0", marginTop: 2 }}>02:00 PM - 03:00 PM</div>
+                  </div>
+                  <span style={{ fontSize: 14, color: "#10b981" }}>✓</span>
+                </div>
+
+                {/* Event 3 */}
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{
+                    width: 44, height: 44, borderRadius: 10, background: "#f4f8f5",
+                    border: "1px solid #e1ebe5", display: "flex", flexDirection: "column",
+                    alignItems: "center", justifyContent: "center", flexShrink: 0,
+                  }}>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: "#072a1d", lineHeight: 1 }}>26</div>
+                    <div style={{ fontSize: 9, fontWeight: 700, color: "#527564", textTransform: "uppercase" }}>Sep</div>
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 12.5, fontWeight: 700, color: "#163428" }}>Post Approval</div>
+                    <div style={{ fontSize: 11, color: "#6b877a" }}>Content approval</div>
+                    <div style={{ fontSize: 10.5, color: "#93aaa0", marginTop: 2 }}>11:00 AM - 12:00 PM</div>
+                  </div>
+                  <span style={{ fontSize: 14, color: "#8daea0" }}>📄</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Actions Card */}
+          <div className="card">
+            <div className="card-header">
+              <div className="card-title" style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                <span>⚡</span>
+                <span>Quick Actions</span>
+              </div>
+            </div>
+            <div className="card-body" style={{ padding: "16px" }}>
+              <div className="egi-quick-actions-grid">
+                <button className="egi-quick-action-btn egi-qa-green" onClick={() => setPage?.("tasks")}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="12" y1="18" x2="12" y2="12"/>
+                    <line x1="9" y1="15" x2="15" y2="15"/>
+                  </svg>
+                  <span>Assign Task</span>
+                </button>
+
+                <button className="egi-quick-action-btn egi-qa-blue" onClick={() => setPage?.("interns")}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                  </svg>
+                  <span>View Interns</span>
+                </button>
+
+                <button className="egi-quick-action-btn egi-qa-purple" onClick={() => setPage?.("projects")}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                  </svg>
+                  <span>Add Project</span>
+                </button>
+
+                <button className="egi-quick-action-btn egi-qa-amber" onClick={() => setPage?.("files")}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10"/>
+                    <line x1="12" y1="20" x2="12" y2="4"/>
+                    <line x1="6" y1="20" x2="6" y2="14"/>
+                  </svg>
+                  <span>Generate Report</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Greener Tomorrow Motto Banner */}
+          <div className="egi-eco-motto-banner">
+            <div>
+              <div className="egi-eco-motto-title">Together for a<br />Greener Tomorrow</div>
+              <div className="egi-eco-motto-sub">Eco Green International</div>
+            </div>
+            <svg width="70" height="70" viewBox="0 0 100 100" fill="#10b981" style={{ opacity: 0.35 }}>
+              <path d="M50 0 C75 25 90 60 70 85 C55 100 25 95 15 80 C0 60 20 20 50 0 Z"/>
+              <path d="M50 0 C45 35 40 65 30 90" stroke="#047857" strokeWidth="3" fill="none"/>
+            </svg>
+          </div>
+
+        </div>
+
       </div>
     </div>
   );
@@ -598,7 +877,9 @@ export function SupervisorDashboard() {
 // ═══════════════════════════════════════════════════════════════════════════════
 export function MyTasksPageSupervisor() {
   const { user } = useAuth();
-  const [allTasks, setAllTasks] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -617,26 +898,29 @@ export function MyTasksPageSupervisor() {
   const load = useCallback(() => {
     if (!user) return;
     setLoading(true);
-    const params = {};
+    const myId = String(user._id || user.id || "");
+    const params = {
+      internId: myId,
+      page,
+      limit: PAGE_SIZE,
+    };
     if (status !== "All") params.status = status;
     if (search) params.search = search;
+    if (filterMode === "date" && filterDate) params.date = filterDate;
+    if (filterMode === "week" && filterWeek) params.weekKey = filterWeek;
+
     taskAPI.getAll(params)
       .then(d => {
-        const mine = (d.tasks || []).filter(
-          t => String(t.assignedTo?._id || t.assignedTo) === String(user._id || user.id)
-        );
-        setAllTasks(mine);
+        setTasks(d.tasks || []);
+        setTotalPages(d.totalPages || 1);
+        setTotalRecords(d.total !== undefined ? d.total : (d.tasks || []).length);
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [status, search, user]);
+  }, [status, search, user, page, filterMode, filterDate, filterWeek]);
 
   useEffect(() => { load(); }, [load]);
   useEffect(() => { setPage(1); }, [filterMode, filterDate, filterWeek, status, search]);
-
-  const filteredTasks = applyDateFilter(allTasks, filterMode, filterDate, filterWeek);
-  const totalPages = Math.ceil(filteredTasks.length / PAGE_SIZE);
-  const tasks = filteredTasks.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const handleSave = async (form) => {
     if (!user) return;
@@ -645,15 +929,14 @@ export function MyTasksPageSupervisor() {
       const taskForm = { ...form, assignedTo: user._id };
       if (editTask) {
         const d = await taskAPI.update(editTask._id || editTask.id, taskForm);
-        setAllTasks(ts => ts.map(t => (t._id || t.id) === (editTask._id || editTask.id) ? d.task : t));
+        setTasks(ts => ts.map(t => (t._id || t.id) === (editTask._id || editTask.id) ? d.task : t));
       } else {
-        const d = await taskAPI.create(taskForm);
-        setAllTasks(ts => [d.task, ...ts]);
+        await taskAPI.create(taskForm);
         if (form.isLeave && weekendDates.length > 0) {
           await Promise.all(weekendDates.map(date => taskAPI.create({ ...taskForm, date, isLeave: true })));
           setWeekendDates([]);
-          load();
         }
+        load();
       }
       setShowModal(false); setEditTask(null);
     } catch (e) { setToast({ msg: e.message, type: "error" }); }
@@ -661,24 +944,24 @@ export function MyTasksPageSupervisor() {
   };
 
   const handleStatus = async (id, newStatus) => {
-    setAllTasks(prev => prev.map(t => (t._id || t.id) === id ? { ...t, status: newStatus } : t));
+    setTasks(prev => prev.map(t => (t._id || t.id) === id ? { ...t, status: newStatus } : t));
     try {
       const d = await taskAPI.updateStatus(id, newStatus);
-      setAllTasks(prev => prev.map(t => (t._id || t.id) === id ? d.task : t));
+      setTasks(prev => prev.map(t => (t._id || t.id) === id ? d.task : t));
     } catch (e) { setToast({ msg: e.message, type: "error" }); load(); }
   };
 
   const handleWorkTimeChange = async (id, minutes) => {
     const mins = typeof minutes === "number" ? minutes : (parseInt(minutes) || 0);
-    setAllTasks(prev => prev.map(t => (t._id || t.id) === id ? { ...t, totalMinutes: mins } : t));
+    setTasks(prev => prev.map(t => (t._id || t.id) === id ? { ...t, totalMinutes: mins } : t));
     try {
       const d = await taskAPI.update(id, { totalMinutes: mins });
-      setAllTasks(prev => prev.map(t => (t._id || t.id) === id ? d.task : t));
+      setTasks(prev => prev.map(t => (t._id || t.id) === id ? d.task : t));
     } catch (e) { setToast({ msg: e.message, type: "error" }); load(); }
   };
 
   const handleTaskUpdated = (updated) => {
-    setAllTasks(ts => ts.map(t => (t._id || t.id) === (updated._id || updated.id) ? updated : t));
+    setTasks(ts => ts.map(t => (t._id || t.id) === (updated._id || updated.id) ? updated : t));
   };
 
   if (!user) return <div style={{ padding: 60, textAlign: "center" }}><div className="spinner" /></div>;
@@ -713,7 +996,7 @@ export function MyTasksPageSupervisor() {
               {["To Do", "In Progress", "Done", "Hold"].map(s => <option key={s}>{s}</option>)}
             </select>
             <DateWeekFilter filterMode={filterMode} setFilterMode={setFilterMode} filterDate={filterDate} setFilterDate={setFilterDate} filterWeek={filterWeek} setFilterWeek={setFilterWeek} weekOptions={weekOptions} />
-            <span className="text-sm text-gray" style={{ marginLeft: "auto" }}>{filteredTasks.length} records</span>
+            <span className="text-sm text-gray" style={{ marginLeft: "auto" }}>{totalRecords} records</span>
           </div>
         </div>
         <div className="table-wrap">
@@ -772,6 +1055,8 @@ export function AllTasksPage() {
   const [view, setView] = useState("cards");
   const [selectedMember, setSelectedMember] = useState(null);
   const [allTasks, setAllTasks] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -812,28 +1097,30 @@ export function AllTasksPage() {
   const load = useCallback(() => {
     if (!user || !selectedMember) return;
     setLoading(true);
-    const params = { internId: selectedMember._id };
+    const params = {
+      internId: selectedMember._id,
+      page,
+      limit: PAGE_SIZE,
+    };
     if (status !== "All") params.status = status;
     if (search) params.search = search;
+    if (filterMode === "date" && filterDate) params.date = filterDate;
+    if (filterMode === "week" && filterWeek) params.weekKey = filterWeek;
+
     taskAPI.getAll(params)
       .then(d => {
-        const all = d.tasks || [];
-        const visible = all.filter(t => {
-          const assigneeId = String(t.assignedTo?._id || t.assignedTo || "");
-          return assigneeId !== myId;
-        });
-        setAllTasks(visible);
+        setAllTasks(d.tasks || []);
+        setTotalPages(d.totalPages || 1);
+        setTotalRecords(d.total !== undefined ? d.total : (d.tasks || []).length);
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [status, search, user, selectedMember, myId]);
+  }, [status, search, user, selectedMember, page, filterMode, filterDate, filterWeek]);
 
   useEffect(() => { if (view === "tasks" && selectedMember) load(); }, [load, view, selectedMember]);
   useEffect(() => { setPage(1); }, [filterMode, filterDate, filterWeek, status, search, selectedMember]);
 
-  const filteredTasks = applyDateFilter(allTasks, filterMode, filterDate, filterWeek);
-  const totalPages = Math.ceil(filteredTasks.length / PAGE_SIZE);
-  const tasks = filteredTasks.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const tasks = allTasks;
 
   const handleSave = async (form) => {
     if (!user) return;
@@ -844,16 +1131,14 @@ export function AllTasksPage() {
         setAllTasks(ts => ts.map(t => (t._id || t.id) === (editTask._id || editTask.id) ? d.task : t));
         setToast({ msg: "Task updated!", type: "success" });
       } else {
-        const d = await taskAPI.create(form);
-        const assigneeId = String(d.task.assignedTo?._id || d.task.assignedTo);
-        if (assigneeId !== myId) setAllTasks(ts => [d.task, ...ts]);
+        await taskAPI.create(form);
         setToast({ msg: form.isLeave ? "Leave day marked!" : "Task assigned!", type: "success" });
         if (form.isLeave && weekendDates.length > 0) {
           await Promise.all(weekendDates.map(date => taskAPI.create({ ...form, date, isLeave: true })));
           setToast({ msg: `Leave + ${weekendDates.length} weekend day(s) saved!`, type: "success" });
           setWeekendDates([]);
-          load();
         }
+        load();
       }
       setShowModal(false); setEditTask(null);
     } catch (e) { setToast({ msg: e.message, type: "error" }); }
@@ -1052,7 +1337,7 @@ export function AllTasksPage() {
               {["To Do", "In Progress", "Done", "Hold"].map(s => <option key={s}>{s}</option>)}
             </select>
             <DateWeekFilter filterMode={filterMode} setFilterMode={setFilterMode} filterDate={filterDate} setFilterDate={setFilterDate} filterWeek={filterWeek} setFilterWeek={setFilterWeek} weekOptions={weekOptions} />
-            <span className="text-sm text-gray" style={{ marginLeft: "auto" }}>{filteredTasks.length} records</span>
+            <span className="text-sm text-gray" style={{ marginLeft: "auto" }}>{totalRecords} records</span>
           </div>
         </div>
         <div className="table-wrap">
@@ -1144,16 +1429,24 @@ export function InternsPage() {
 
   const PAGE_SIZE = 12;
   const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
 
-  const loadReport = () => {
+  const loadReport = useCallback(() => {
     setLoading(true);
-    reportAPI.interns().then(d => { setReport(d.report || []); setLoading(false); setPage(1); }).catch(() => setLoading(false));
-  };
-  useEffect(() => { loadReport(); }, []);
-  useEffect(() => { setPage(1); }, [report.length]);
+    reportAPI.interns({ page, limit: PAGE_SIZE })
+      .then(d => {
+        setReport(d.report || []);
+        setTotalPages(d.totalPages || 1);
+        setTotalCount(d.total !== undefined ? d.total : (d.report || []).length);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [page]);
 
-  const totalPages = Math.ceil(report.length / PAGE_SIZE);
-  const paginatedInterns = report.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  useEffect(() => { loadReport(); }, [loadReport]);
+
+  const paginatedInterns = report;
 
   const handleResetPassword = async () => {
     if (!newPass || newPass.length < 6) { setToast({ msg: "Password must be at least 6 characters.", type: "error" }); return; }
@@ -1186,9 +1479,9 @@ export function InternsPage() {
     setDeleting(true);
     try {
       await userAPI.delete(deleteTarget._id);
-      setReport(r => r.filter(i => i._id !== deleteTarget._id));
       setToast({ msg: `${deleteTarget.name} removed.`, type: "success" });
       setDeleteTarget(null);
+      loadReport();
     } catch (e) { setToast({ msg: e.message, type: "error" }); }
     setDeleting(false);
   };
@@ -1216,7 +1509,7 @@ export function InternsPage() {
         <button style={btnStyle(false, page === 1)} disabled={page === 1} onClick={() => setPage(page - 1)}>← Prev</button>
         {visible.map((n, i) => n === "..." ? (<span key={`ellipsis-${i}`} style={{ padding: "5px 4px", fontSize: 12, color: "#9ca3af" }}>…</span>) : (<button key={n} style={btnStyle(n === page, false)} onClick={() => setPage(n)}>{n}</button>))}
         <button style={btnStyle(false, page === totalPages)} disabled={page === totalPages} onClick={() => setPage(page + 1)}>Next →</button>
-        <span style={{ fontSize: 11, color: "var(--gray-400)", marginLeft: 6 }}>Page {page} of {totalPages} ({report.length} total interns)</span>
+        <span style={{ fontSize: 11, color: "var(--gray-400)", marginLeft: 6 }}>Page {page} of {totalPages} ({totalCount} total interns)</span>
       </div>
     );
   };

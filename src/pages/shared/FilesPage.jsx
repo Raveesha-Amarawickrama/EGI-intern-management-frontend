@@ -4,6 +4,7 @@ import FileUploader from "../../components/shared/FileUploader";
 import useFiles from "../../hooks/useFiles";
 import { useAuth } from "../../hooks/useAuth";
 import { projectAPI } from "../../utils/api";
+import { FolderIcon, UploadIcon } from "../../components/shared/Icons.jsx";
 
 const Toast = ({ message, type, onClose }) => (
   <div style={{
@@ -89,7 +90,9 @@ export default function FilesPage() {
 
       {/* Header */}
       <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: 26, fontWeight: 700, marginBottom: 6 }}>📁 File Management</h1>
+        <h1 style={{ fontSize: 26, fontWeight: 700, marginBottom: 6, display: 'flex', alignItems: 'center', gap: 10 }}>
+          <FolderIcon size={28} color="var(--egi-green)" /> File Management
+        </h1>
         <p style={{ color: '#777', fontSize: 14 }}>Files are organized by project folders</p>
       </div>
 
@@ -99,7 +102,9 @@ export default function FilesPage() {
         <div style={{ width: 240, flexShrink: 0 }}>
           <div className="card">
             <div className="card-header">
-              <div className="card-title" style={{ fontSize: 14 }}>📂 Project Folders</div>
+              <div className="card-title" style={{ fontSize: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <FolderIcon size={16} color="var(--egi-green)" /> Project Folders
+              </div>
             </div>
             <div style={{ padding: '8px 0' }}>
               {projects.length === 0 ? (
@@ -128,8 +133,8 @@ export default function FilesPage() {
                     >
                       <span style={{ fontSize: 13, transition: 'transform 0.2s', display: 'inline-block',
                         transform: openFolders[p._id] ? 'rotate(90deg)' : 'rotate(0deg)' }}>▶</span>
-                      <span style={{ fontSize: 15 }}>
-                        {p.icon || '📁'}
+                      <span style={{ display: 'flex', alignItems: 'center' }}>
+                        <FolderIcon size={16} color={selectedProject === p._id ? 'var(--egi-green)' : '#64748b'} />
                       </span>
                       <span style={{
                         fontSize: 13, fontWeight: selectedProject === p._id ? 600 : 400,
@@ -167,7 +172,9 @@ export default function FilesPage() {
               background: '#e8f5f0', borderRadius: 12,
               border: '1px solid #b2dfce',
             }}>
-              <span style={{ fontSize: 28 }}>{selectedProjectObj.icon || '📁'}</span>
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                <FolderIcon size={26} color="var(--egi-green)" />
+              </span>
               <div>
                 <div style={{ fontWeight: 700, fontSize: 17, color: '#1D9E75' }}>
                   {selectedProjectObj.name}
@@ -182,7 +189,9 @@ export default function FilesPage() {
           {/* Upload */}
           <div className="card" style={{ marginBottom: 20 }}>
             <div className="card-header">
-              <div className="card-title">📤 Upload to {selectedProjectObj?.name || 'Project'}</div>
+              <div className="card-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <UploadIcon size={16} color="var(--egi-green)" /> Upload to {selectedProjectObj?.name || 'Project'}
+              </div>
             </div>
             <div style={{ padding: '14px 24px' }}>
               {selectedProject ? (
@@ -203,7 +212,9 @@ export default function FilesPage() {
           {!selectedProject ? (
             <div className="card">
               <div className="empty-state">
-                <div className="empty-icon">📂</div>
+                <div className="empty-icon" style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
+                  <FolderIcon size={44} color="#94a3b8" />
+                </div>
                 <h3>Select a folder</h3>
                 <p style={{ color: '#888' }}>Choose a project folder from the left to view its files.</p>
               </div>
@@ -215,7 +226,9 @@ export default function FilesPage() {
           ) : files.length === 0 ? (
             <div className="card">
               <div className="empty-state">
-                <div className="empty-icon">📭</div>
+                <div className="empty-icon" style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
+                  <FolderIcon size={44} color="#94a3b8" />
+                </div>
                 <h3>No files yet</h3>
                 <p style={{ color: '#888' }}>Upload a file to this project folder above.</p>
               </div>

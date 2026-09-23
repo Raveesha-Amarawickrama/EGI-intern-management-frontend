@@ -72,25 +72,6 @@ const SUPERVISOR_NAV_JUNIOR = [
   
 ];
 
-const META = {
-  diary:       { title: "My Diary",          sub: "Personal journal — your private space"  }, 
-  dashboard:   { title: "Dashboard",        sub: "Overview of EGI internship activity"    },
-  mytasks:     { title: "My Tasks",          sub: "View, create and manage your own tasks" },
-  profile:     { title: "My Profile",        sub: "Your personal information and stats"    },
-  tasks:       { title: "All Tasks",         sub: "Manage and supervise all tasks"         },
-  interns:     { title: "Interns",           sub: "Active intern profiles and performance" },
-  supervisors: { title: "Supervisors",       sub: "Manage supervisor accounts"             },
-  projects:    { title: "Projects",          sub: "Project overview and progress tracking" },
- 
-  schedule:    { title: "Schedule",          sub: "Meetings and calendar"                  },
-  social:      { title: "Post Approval",     sub: "Review and approve social media drafts" },
-  content:     { title: "Content Calendar",  sub: "Published content overview"             },
-  files:       { title: "Files",             sub: "Upload, share and manage documents"     },
-  // ── NEW: renewals page meta ───────────────────────────────────────────────
-  renewals:    { title: "Third-Party Renewals", sub: "Track subscriptions, licenses and contracts" },
-  
-};
-
 // ── Sidebar ──────────────────────────────────────────────────────────────────
 export function Sidebar({ page, setPage }) {
   const { user, logout, isSenior, isJunior } = useAuth();
@@ -120,226 +101,198 @@ export function Sidebar({ page, setPage }) {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
 
         .egi-sidebar { font-family: 'DM Sans', sans-serif; }
 
         .egi-nav-item {
           display: flex;
           align-items: center;
-          gap: 11px;
-          padding: 9px 14px;
-          border-radius: 8px;
+          gap: 12px;
+          padding: 10px 14px;
+          border-radius: 10px;
           cursor: pointer;
-          color: rgba(255,255,255,0.45);
-          font-size: 13px;
+          color: rgba(255,255,255,0.72);
+          font-size: 13.5px;
           font-weight: 500;
           transition: all 0.15s ease;
           user-select: none;
           position: relative;
-          margin-bottom: 1px;
+          margin-bottom: 2px;
           border: 1px solid transparent;
         }
         .egi-nav-item:hover {
-          color: rgba(255,255,255,0.85);
-          background: rgba(255,255,255,0.05);
+          color: #ffffff;
+          background: rgba(255,255,255,0.06);
         }
         .egi-nav-item.active {
-          color: #10b981;
-          background: rgba(16,185,129,0.1);
-          border-color: rgba(16,185,129,0.2);
-          font-weight: 600;
+          color: #ffffff;
+          background: #0f6240;
+          border-color: rgba(255,255,255,0.12);
+          box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+          font-weight: 650;
         }
-        .egi-nav-item.active .nav-icon { color: #10b981; }
+        .egi-nav-item.active .nav-icon { color: #ffffff; opacity: 1; }
         .egi-nav-item .nav-icon {
           width: 20px;
           display: flex;
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
-          opacity: 0.7;
+          opacity: 0.75;
           transition: opacity 0.15s;
         }
-        .egi-nav-item:hover .nav-icon,
-        .egi-nav-item.active .nav-icon { opacity: 1; }
+        .egi-nav-item:hover .nav-icon { opacity: 1; }
 
-        /* diary item gets a subtle amber tint when not active */
-        .egi-nav-item.diary-item:not(.active) {
-          color: rgba(251,191,36,0.55);
-        }
-        .egi-nav-item.diary-item:not(.active):hover {
-          color: rgba(251,191,36,0.9);
-          background: rgba(251,191,36,0.06);
-        }
+        .egi-nav-scroll::-webkit-scrollbar { width: 3px; }
+        .egi-nav-scroll::-webkit-scrollbar-track { background: transparent; }
+        .egi-nav-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
 
-        .egi-section-label {
-          font-family: 'DM Mono', monospace;
-          font-size: 9px;
-          font-weight: 500;
-          color: rgba(255,255,255,0.2);
-          letter-spacing: 1.5px;
-          text-transform: uppercase;
-          padding: 16px 14px 8px;
-        }
         .egi-signout-btn {
           width: 100%;
-          padding: 9px 14px;
-          border-radius: 8px;
-          border: 1px solid rgba(239,68,68,0.2);
-          background: rgba(239,68,68,0.06);
-          color: rgba(239,68,68,0.7);
+          padding: 10px 14px;
+          border-radius: 10px;
+          border: 1px solid rgba(255,255,255,0.16);
+          background: rgba(255,255,255,0.04);
+          color: #f1f5f9;
           font-family: 'DM Sans', sans-serif;
-          font-size: 12.5px;
+          font-size: 13px;
           font-weight: 600;
           cursor: pointer;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 8px;
+          gap: 9px;
           transition: all 0.15s ease;
-          letter-spacing: 0.2px;
         }
         .egi-signout-btn:hover {
-          background: rgba(239,68,68,0.14);
-          border-color: rgba(239,68,68,0.4);
+          background: rgba(239,68,68,0.15);
+          border-color: rgba(239,68,68,0.35);
           color: #fca5a5;
-        }
-        .egi-nav-scroll::-webkit-scrollbar { width: 3px; }
-        .egi-nav-scroll::-webkit-scrollbar-track { background: transparent; }
-        .egi-nav-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
-
-        /* diary nav separator line */
-        .egi-nav-divider {
-          height: 1px;
-          background: rgba(255,255,255,0.05);
-          margin: 8px 14px;
         }
       `}</style>
 
       <nav className="egi-sidebar" style={{
-        width: 248,
-        background: "#0b1a13",
-        backgroundImage: "radial-gradient(ellipse at top left, rgba(16,185,129,0.06) 0%, transparent 60%)",
+        width: 260,
+        background: "linear-gradient(180deg, #072a1d 0%, #041910 100%)",
         height: "100vh",
         display: "flex",
         flexDirection: "column",
         position: "fixed",
         top: 0, left: 0,
         zIndex: 100,
-        borderRight: "1px solid rgba(255,255,255,0.05)",
+        borderRight: "1px solid rgba(255,255,255,0.06)",
+        boxShadow: "2px 0 16px rgba(0,0,0,0.12)",
       }}>
 
         {/* Brand */}
-        <div style={{ padding: "24px 20px 20px", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+        <div style={{ padding: "24px 22px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{
-              width: 40, height: 40,
-              background: "linear-gradient(135deg, #10b981, #059669)",
+              width: 42, height: 42,
               borderRadius: 10,
               display: "flex", alignItems: "center", justifyContent: "center",
-              boxShadow: "0 4px 14px rgba(16,185,129,0.35)",
               flexShrink: 0,
             }}>
-              <img src={egiLogo} alt="EGI"
-                style={{ width: "75%", height: "75%", objectFit: "contain", filter: "brightness(0) invert(1)" }}
-                onError={e => { e.target.style.display = "none"; e.target.nextSibling.style.display = "flex"; }}
+              <img src={egiLogo} alt="EGI Logo"
+                style={{ width: "100%", height: "100%", objectFit: "contain" }}
               />
-              <span style={{ display: "none", color: "white", fontWeight: 800, fontSize: 14 }}>E</span>
             </div>
             <div>
-              <div style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 13, color: "white", letterSpacing: 0.3 }}>
-                Eco Green
+              <div style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 800, fontSize: 15, color: "#ffffff", letterSpacing: 1.2, lineHeight: 1.15 }}>
+                ECO GREEN
               </div>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9, color: "rgba(255,255,255,0.3)", letterSpacing: 1, textTransform: "uppercase", marginTop: 1 }}>
-                International
+              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 9.5, color: "rgba(255,255,255,0.6)", letterSpacing: 2, textTransform: "uppercase", marginTop: 2 }}>
+                INTERNATIONAL
               </div>
             </div>
           </div>
         </div>
 
-        {/* Nav */}
-        <div className="egi-nav-scroll" style={{ flex: 1, overflowY: "auto", padding: "8px 12px" }}>
-          <div className="egi-section-label">Navigation</div>
-
-          {nav.map((item, idx) => {
+        {/* Navigation Items */}
+        <div className="egi-nav-scroll" style={{ flex: 1, overflowY: "auto", padding: "12px 14px" }}>
+          {nav.map((item) => {
             const isDiary = item.key === "diary";
-            // Insert a divider line just before the diary item
-            const prevItem = nav[idx - 1];
-            const showDivider = isDiary && prevItem;
 
             return (
-              <div key={item.key}>
-                {showDivider && <div className="egi-nav-divider" />}
-                <div
-                  className={`egi-nav-item${page === item.key ? " active" : ""}${isDiary ? " diary-item" : ""}`}
-                  onClick={() => setPage(item.key)}
-                >
-                  <span className="nav-icon">{icons[item.key] || icons.files}</span>
-                  {item.label}
+              <div
+                key={item.key}
+                className={`egi-nav-item${page === item.key ? " active" : ""}`}
+                onClick={() => setPage(item.key)}
+              >
+                <span className="nav-icon">{icons[item.key] || icons.files}</span>
+                <span>{item.label}</span>
 
-                  {/* "Private" pill shown only on diary when not active */}
-                  {isDiary && page !== item.key && (
-                    <span style={{
-                      marginLeft: "auto",
-                      fontSize: 8, fontWeight: 700,
-                      padding: "1px 6px", borderRadius: 99,
-                      background: "rgba(251,191,36,0.12)",
-                      color: "rgba(251,191,36,0.6)",
-                      border: "1px solid rgba(251,191,36,0.18)",
-                      letterSpacing: "0.4px",
-                      textTransform: "uppercase",
-                      flexShrink: 0,
-                    }}>Private</span>
-                  )}
-
-                  {page === item.key && (
-                    <span style={{
-                      marginLeft: "auto", width: 6, height: 6,
-                      borderRadius: "50%", background: "#10b981",
-                      flexShrink: 0,
-                    }} />
-                  )}
-                </div>
+                {/* "PRIVATE" badge shown on Diary */}
+                {isDiary && (
+                  <span style={{
+                    marginLeft: "auto",
+                    fontSize: 8.5, fontWeight: 800,
+                    padding: "2px 7px", borderRadius: 99,
+                    background: "#453408",
+                    color: "#f5c84c",
+                    border: "1px solid #785a12",
+                    letterSpacing: "0.5px",
+                    textTransform: "uppercase",
+                    flexShrink: 0,
+                  }}>PRIVATE</span>
+                )}
               </div>
             );
           })}
         </div>
 
-        {/* User footer */}
-        <div style={{ padding: "14px 12px 18px", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+        {/* User Profile Card & Signout Footer */}
+        <div style={{ padding: "14px 14px 18px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
           <div style={{
             display: "flex", alignItems: "center", gap: 10,
-            padding: "10px 12px", borderRadius: 10,
+            padding: "10px 12px", borderRadius: 12,
             background: "rgba(255,255,255,0.04)",
-            border: "1px solid rgba(255,255,255,0.07)",
+            border: "1px solid rgba(255,255,255,0.08)",
             marginBottom: 10,
           }}>
             <div style={{ position: "relative", flexShrink: 0 }}>
               <Avatar initials={user?.name?.charAt(0) || "U"} color={user?.avatarColor || "#10b981"} size="sm" src={user?.profilePicture} />
               <span style={{
-                position: "absolute", bottom: 0, right: 0,
+                position: "absolute", bottom: -1, right: -1,
                 width: 8, height: 8, borderRadius: "50%",
                 background: levelDot,
-                border: "2px solid #0b1a13",
+                border: "2px solid #072a1d",
               }} />
             </div>
             <div style={{ flex: 1, overflow: "hidden" }}>
               <div style={{
                 fontFamily: "'DM Sans', sans-serif",
-                fontSize: 12.5, fontWeight: 600, color: "white",
+                fontSize: 13, fontWeight: 700, color: "#ffffff",
                 whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
               }}>{user?.name || "User"}</div>
               <div style={{
                 fontFamily: "'DM Mono', monospace",
-                fontSize: 9.5, color: "rgba(255,255,255,0.3)",
-                letterSpacing: 0.5, marginTop: 1,
+                fontSize: 9, color: "rgba(255,255,255,0.5)",
+                letterSpacing: 0.6, marginTop: 1,
               }}>{levelLabel.toUpperCase()}</div>
             </div>
+            <button
+              onClick={() => setPage("profile")}
+              title="Settings & Profile"
+              style={{
+                background: "none", border: "none", cursor: "pointer",
+                color: "rgba(255,255,255,0.45)", padding: 4, display: "flex", alignItems: "center",
+                transition: "color 0.15s",
+              }}
+              onMouseEnter={e => e.currentTarget.style.color = "#ffffff"}
+              onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.45)"}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+              </svg>
+            </button>
           </div>
 
           <button className="egi-signout-btn" onClick={logout}>
             {icons.signout}
-            Sign Out
+            Log Out
           </button>
         </div>
       </nav>
@@ -349,40 +302,47 @@ export function Sidebar({ page, setPage }) {
 
 // ── Topbar ────────────────────────────────────────────────────────────────────
 export function Topbar({ page }) {
-  const { user, isSenior, isJunior } = useAuth();
-  const meta = META[page] || { title: page.charAt(0).toUpperCase() + page.slice(1), sub: "" };
+  const { user, isSenior } = useAuth();
 
   const now = new Date().toLocaleDateString("en-GB", {
-    weekday: "long", year: "numeric", month: "long", day: "numeric",
+    weekday: "long", day: "numeric", month: "long", year: "numeric",
   });
 
-  const badge = isSenior
-    ? { label: "Senior Supervisor", bg: "rgba(245,158,11,0.12)", color: "#f59e0b", border: "rgba(245,158,11,0.25)" }
-    : isJunior
-    ? { label: "Junior Supervisor", bg: "rgba(249,115,22,0.12)", color: "#f97316", border: "rgba(249,115,22,0.25)" }
-    : user?.role === "supervisor"
-    ? { label: "Supervisor",        bg: "rgba(16,185,129,0.12)", color: "#10b981", border: "rgba(16,185,129,0.25)" }
-    : { label: "Intern",            bg: "rgba(99,102,241,0.12)", color: "#818cf8", border: "rgba(99,102,241,0.25)" };
+  const roleText = user?.role === "intern"
+    ? "Intern"
+    : isSenior
+    ? "Senior Supervisor"
+    : "Supervisor";
 
   return (
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
         .egi-topbar { font-family: 'DM Sans', sans-serif; }
-        .egi-topbar-date {
-          font-family: 'DM Mono', monospace;
-          font-size: 10.5px;
-          color: #94a3b8;
-          font-weight: 500;
-          letter-spacing: 0.3px;
+        .egi-topbar-search-input {
+          width: 340px;
+          height: 38px;
+          padding: 0 16px 0 38px;
+          border-radius: 999px;
+          border: 1px solid #e1ece5;
+          background: #f1f5f3;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 13px;
+          color: #1e293b;
+          outline: none;
+          transition: all 0.15s ease;
+        }
+        .egi-topbar-search-input:focus {
+          background: #ffffff;
+          border-color: #10b981;
+          box-shadow: 0 0 0 3px rgba(16,185,129,0.12);
         }
       `}</style>
 
       <header className="egi-topbar" style={{
-        background: "rgba(255,255,255,0.97)",
-        backdropFilter: "blur(12px)",
-        borderBottom: "1px solid #e8edf3",
-        padding: "0 36px",
+        background: "#ffffff",
+        borderBottom: "1px solid #e8f0ec",
+        padding: "0 32px",
         height: 64,
         display: "flex",
         alignItems: "center",
@@ -390,67 +350,76 @@ export function Topbar({ page }) {
         position: "sticky",
         top: 0,
         zIndex: 50,
-        boxShadow: "0 1px 0 rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.03)",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.02)",
       }}>
 
-        {/* Left */}
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <div style={{
-            width: 3, height: 22,
-            background: page === "diary"
-              ? "linear-gradient(180deg, #f59e0b, #d97706)"   // amber for diary
-              : "linear-gradient(180deg, #10b981, #059669)",
-            borderRadius: 2, flexShrink: 0,
-          }} />
-          <div>
-            <h2 style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: 17, fontWeight: 800,
-              color: "#0f172a", margin: 0, letterSpacing: "-0.3px",
-            }}>
-              {page === "diary" ? "📓 " : ""}{meta.title}
-            </h2>
-            <p style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: 11.5, color: "#94a3b8",
-              margin: 0, marginTop: 1, fontWeight: 400,
-            }}>{meta.sub}</p>
-          </div>
+        {/* Left: Global Search Capsule */}
+        <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+          <svg style={{ position: "absolute", left: 13, pointerEvents: "none", color: "#64748b" }} width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input
+            type="text"
+            className="egi-topbar-search-input"
+            placeholder="Search interns, tasks, or projects..."
+          />
         </div>
 
-        {/* Right */}
+        {/* Right: Notifications, Date & User Profile */}
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          {/* ── NEW: renewal reminder bell, senior supervisors only ── */}
-          {isSenior && <RenewalNotificationBell />}
+          {/* Notification Bell */}
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            {isSenior ? (
+              <RenewalNotificationBell />
+            ) : (
+              <button
+                title="Notifications"
+                style={{
+                  background: "none", border: "none", cursor: "pointer",
+                  position: "relative", color: "#475569", display: "flex", alignItems: "center",
+                }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                </svg>
+                <span style={{
+                  position: "absolute", top: -1, right: -1, width: 7, height: 7,
+                  borderRadius: "50%", background: "#ef4444", border: "1.5px solid #fff",
+                }} />
+              </button>
+            )}
+          </div>
 
-          <div className="egi-topbar-date">{now}</div>
-          <div style={{ width: 1, height: 28, background: "#e2e8f0" }} />
-          <span style={{
-            fontFamily: "'DM Mono', monospace",
-            fontSize: 10, fontWeight: 500,
-            padding: "4px 12px", borderRadius: 20,
-            background: badge.bg, color: badge.color,
-            border: `1px solid ${badge.border}`,
-            letterSpacing: "0.5px",
-            textTransform: "uppercase",
-          }}>{badge.label}</span>
+          {/* Date Badge */}
+          <div style={{
+            display: "flex", alignItems: "center", gap: 7,
+            padding: "6px 12px", borderRadius: 8,
+            background: "#f4f8f5", border: "1px solid #e2ece6",
+            fontSize: 12, fontWeight: 500, color: "#3e564a",
+          }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            <span>{now}</span>
+          </div>
 
+          <div style={{ width: 1, height: 26, background: "#e2e8f0" }} />
+
+          {/* User Info */}
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ textAlign: "right" }}>
-              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 600, color: "#1e293b", lineHeight: 1.2 }}>
-                {user?.name}
+            <Avatar initials={user?.name?.charAt(0)} color={user?.avatarColor || "#10b981"} size="sm" src={user?.profilePicture} />
+            <div>
+              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 700, color: "#0f281e", lineHeight: 1.15 }}>
+                {user?.name || "User"}
               </div>
-              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: "#94a3b8", marginTop: 1 }}>
-                {user?.position || badge.label}
+              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: "#5a7568", marginTop: 2 }}>
+                {roleText}
               </div>
-            </div>
-            <div style={{ position: "relative" }}>
-              <Avatar initials={user?.name?.charAt(0)} color={user?.avatarColor || "#10b981"} size="sm" src={user?.profilePicture} />
-              <span style={{
-                position: "absolute", bottom: 0, right: 0,
-                width: 8, height: 8, borderRadius: "50%",
-                background: "#10b981", border: "2px solid white",
-              }} />
             </div>
           </div>
         </div>

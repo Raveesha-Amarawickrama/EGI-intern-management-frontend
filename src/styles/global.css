@@ -213,3 +213,401 @@ tr:hover td{background:var(--green-50)}
 
 .loading-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;background:var(--gray-50)}
 .loading-screen p{font-size:14px;color:var(--gray-500)}
+
+/* ================================================================
+   2026 ECO GREEN FINAL UI POLISH
+   Shared visual layer for legacy pages/components.
+   ================================================================ */
+:root {
+  --egi-deep: #073d2f;
+  --egi-green: #0a6649;
+  --egi-green-2: #11815e;
+  --egi-soft: #eef8f3;
+  --egi-border: #dce9e3;
+  --egi-ink: #17352c;
+  --egi-muted: #667b73;
+  --egi-bg: #f5f8f6;
+  --egi-shadow: 0 8px 28px rgba(7,61,47,.07);
+}
+
+html { background: var(--egi-bg); }
+body { color: var(--egi-ink); background: var(--egi-bg); }
+button, input, select, textarea { font: inherit; }
+button { transition: transform .15s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease; }
+button:not(:disabled):active { transform: translateY(1px); }
+
+.card,
+.intern-card,
+.diary-panel,
+.diary-sidebar-card,
+.week-summary {
+  border: 1px solid var(--egi-border) !important;
+  border-radius: 14px !important;
+  background: #fff !important;
+  box-shadow: var(--egi-shadow) !important;
+}
+
+.card-header {
+  padding: 16px 18px !important;
+  border-bottom: 1px solid #edf2ef !important;
+  background: linear-gradient(180deg,#fff,#fbfdfc) !important;
+}
+.card-body { padding: 18px !important; }
+.card-title { color: var(--egi-deep) !important; font-weight: 750 !important; letter-spacing: -.01em; }
+
+.btn { min-height: 38px; border-radius: 9px !important; font-weight: 650 !important; }
+.btn-primary {
+  border-color: var(--egi-green) !important;
+  background: linear-gradient(135deg,var(--egi-green),var(--egi-green-2)) !important;
+  color: #fff !important;
+  box-shadow: 0 5px 14px rgba(10,102,73,.18);
+}
+.btn-primary:hover { box-shadow: 0 8px 20px rgba(10,102,73,.24); transform: translateY(-1px); }
+.btn-secondary { border-color: var(--egi-border) !important; background: #fff !important; color: var(--egi-ink) !important; }
+.btn-danger { border-radius: 9px !important; }
+.btn-icon { border-radius: 8px !important; }
+
+.form-input,.form-select,.form-textarea,.search-input,.filter-select {
+  min-height: 40px;
+  border: 1px solid #d8e4de !important;
+  border-radius: 9px !important;
+  background: #fff !important;
+  color: var(--egi-ink) !important;
+  box-shadow: 0 1px 2px rgba(7,61,47,.02);
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.form-input:focus,.form-select:focus,.form-textarea:focus,.search-input:focus,.filter-select:focus {
+  border-color: #72b79e !important;
+  box-shadow: 0 0 0 3px rgba(17,129,94,.10) !important;
+}
+.form-label,.auth-label { color: #405e53 !important; font-weight: 650 !important; }
+
+.table-wrap { border: 1px solid var(--egi-border); border-radius: 12px; overflow: auto; background: #fff; }
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table thead th {
+  background: #f6faf8 !important;
+  color: #587067 !important;
+  font-size: 11px !important;
+  font-weight: 750 !important;
+  letter-spacing: .035em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--egi-border) !important;
+}
+.data-table tbody td { border-bottom-color: #edf2ef !important; }
+.data-table tbody tr:hover { background: #f9fcfa !important; }
+
+.stat-value { color: var(--egi-deep) !important; font-weight: 800 !important; }
+.stat-label,.text-gray { color: var(--egi-muted) !important; }
+.stat-icon { border-radius: 11px !important; }
+.progress-bar { border-radius: 999px !important; overflow: hidden; background: #e8f1ed !important; }
+
+.badge-dot,.chip,.tag { border-radius: 999px !important; }
+.filters { gap: 10px !important; }
+.search-wrap { position: relative; }
+.empty-state { padding: 48px 20px !important; color: var(--egi-muted); }
+.empty-icon { filter: saturate(.85); }
+
+.modal-overlay { background: rgba(3,32,23,.62) !important; backdrop-filter: blur(5px); }
+.modal { border: 1px solid rgba(255,255,255,.6); border-radius: 16px !important; box-shadow: 0 28px 80px rgba(0,0,0,.24) !important; }
+.modal-header { border-bottom: 1px solid #edf2ef !important; }
+.modal-footer { border-top: 1px solid #edf2ef !important; background: #fbfdfc !important; }
+.modal-title { color: var(--egi-deep) !important; }
+.modal-close { border-radius: 8px !important; }
+
+.profile-header {
+  background: linear-gradient(135deg, #f4faf6 0%, #edf7f1 100%) !important;
+  color: var(--egi-deep) !important;
+  padding: 20px !important;
+  border-radius: 14px !important;
+  border: 1px solid #dcefe3 !important;
+}
+.profile-info-item {
+  border-radius: 10px !important;
+  background: #f8fbf9 !important;
+  border: 1px solid #e5ede8 !important;
+  padding: 12px 14px !important;
+}
+.profile-info-item label {
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.03em !important;
+  color: var(--egi-muted) !important;
+  margin-bottom: 4px !important;
+  display: block !important;
+}
+.profile-info-item p {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: var(--egi-deep) !important;
+  margin: 0 !important;
+}
+
+.alert { border-radius: 10px !important; }
+.alert-info { background: #eff8f4 !important; border-color: #cce6db !important; color: #245f49 !important; }
+.alert-warning { border-radius: 10px !important; }
+
+@media (max-width: 900px) {
+  .grid-4 { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+  .grid-3 { grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+}
+@media (max-width: 620px) {
+  .grid-4,.grid-3,.grid-2,.form-grid { grid-template-columns: 1fr !important; }
+  .card-body,.card-header { padding: 14px !important; }
+  .filters { flex-wrap: wrap; }
+}
+
+/* ================================================================
+   2026 EGI DASHBOARD COMPONENT STYLES
+   ================================================================ */
+.egi-greeting-banner {
+  background-color: #ebf6f0;
+  background-image: 
+    linear-gradient(90deg, rgba(235, 246, 240, 0.98) 0%, rgba(235, 246, 240, 0.92) 36%, rgba(235, 246, 240, 0.35) 68%, rgba(235, 246, 240, 0.04) 100%),
+    url('../assets/greeting-banner.png');
+  background-size: cover;
+  background-position: right center;
+  background-repeat: no-repeat;
+  border: 1px solid #d2ead8;
+  border-radius: 16px;
+  padding: 24px 28px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 18px rgba(7, 45, 30, 0.04);
+}
+
+.egi-greeting-left {
+  position: relative;
+  z-index: 2;
+  max-width: 600px;
+}
+
+.egi-greeting-salutation {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #3b574a;
+  margin-bottom: 4px;
+}
+
+.egi-greeting-name {
+  font-family: 'DM Sans', 'Syne', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: #072a1d;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: -0.3px;
+}
+
+.egi-greeting-sub {
+  font-size: 13px;
+  color: #557566;
+  margin-top: 4px;
+}
+
+.egi-quote-box {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 8px;
+  padding: 8px 14px;
+  margin-top: 14px;
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #11422f;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
+.egi-greeting-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+  z-index: 2;
+}
+
+.egi-greeting-leaf-art {
+  position: absolute;
+  right: -20px;
+  top: -20px;
+  width: 220px;
+  height: 180px;
+  opacity: 0.28;
+  pointer-events: none;
+}
+
+/* 4-Stat Cards Row */
+.egi-stat-card-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.egi-stat-card {
+  background: #ffffff;
+  border: 1px solid #e2ece6;
+  border-radius: 16px;
+  padding: 20px 22px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(7, 45, 30, 0.04);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.egi-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 26px rgba(7, 45, 30, 0.08);
+}
+
+.egi-stat-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.egi-stat-icon-bubble {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.egi-stat-arrow {
+  color: #10b981;
+  font-size: 14px;
+  transition: transform 0.15s;
+}
+
+.egi-stat-card:hover .egi-stat-arrow {
+  transform: translateX(2px);
+}
+
+.egi-stat-value {
+  font-family: 'DM Sans', 'Syne', sans-serif;
+  font-size: 30px;
+  font-weight: 800;
+  color: #072a1d;
+  line-height: 1.1;
+}
+
+.egi-stat-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #334e42;
+  margin-top: 4px;
+}
+
+.egi-stat-subtitle {
+  font-size: 11.5px;
+  color: #799487;
+  margin-top: 3px;
+  font-weight: 500;
+}
+
+.egi-stat-wave-bg {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 110px;
+  height: 90px;
+  pointer-events: none;
+  opacity: 0.18;
+}
+
+/* Quick Actions 2x2 Grid */
+.egi-quick-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.egi-quick-action-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 16px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.egi-quick-action-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(0.97);
+}
+
+.egi-qa-green {
+  background: #ecf9f2;
+  color: #0d593e;
+}
+
+.egi-qa-blue {
+  background: #edf5fe;
+  color: #1d4ed8;
+}
+
+.egi-qa-purple {
+  background: #f4effd;
+  color: #6b21a8;
+}
+
+.egi-qa-amber {
+  background: #fdf6ea;
+  color: #b45309;
+}
+
+/* Green Banner Widget */
+.egi-eco-motto-banner {
+  background: linear-gradient(135deg, #e4f4ec 0%, #dbefe5 100%);
+  border: 1px solid #c9e6d7;
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.egi-eco-motto-title {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #073826;
+  font-style: italic;
+}
+
+.egi-eco-motto-sub {
+  font-size: 10px;
+  color: #4f7362;
+  margin-top: 2px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 1024px) {
+  .egi-stat-card-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+

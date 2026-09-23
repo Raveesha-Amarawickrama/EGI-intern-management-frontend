@@ -145,7 +145,7 @@ export default function SchedulePage() {
         {/* Upcoming sidebar */}
         <div>
           <div className="card">
-            <div className="card-header"><div className="card-title">📅 Upcoming (7 days)</div></div>
+            <div className="card-header"><div className="card-title">Upcoming (7 days)</div></div>
             <div style={{ padding:'0 0 8px' }}>
               {upcoming.length === 0 ? (
                 <div style={{ padding:'20px 20px', color:'#9ca3af', fontSize:13 }}>No upcoming meetings.</div>
@@ -167,7 +167,7 @@ export default function SchedulePage() {
                     <div style={{ fontSize:11, color:'#9ca3af', marginTop:4 }}>
                       {formatDate(m.date)} · {m.startTime}
                     </div>
-                    <div style={{ fontSize:11, color:'#9ca3af' }}>📍 {m.location || 'Online'}</div>
+                    <div style={{ fontSize:11, color:'#9ca3af' }}>{m.location || 'Online'}</div>
                   </div>
                 );
               })}

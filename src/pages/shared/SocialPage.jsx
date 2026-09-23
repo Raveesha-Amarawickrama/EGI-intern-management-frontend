@@ -2,6 +2,15 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { Toast } from "../../components/shared/index.jsx";
+import {
+  ClipboardIcon,
+  CheckCircleIcon,
+  HourglassIcon,
+  XCircleIcon,
+  CalendarIcon,
+  TrophyIcon,
+  FolderIcon,
+} from "../../components/shared/Icons.jsx";
 
 const BASE             = "/api/social";
 const SOCIAL_PROJ_BASE = "/api/social-projects";
@@ -129,8 +138,8 @@ function WeeklySummary({ contents }) {
       padding: "20px 24px", marginBottom: 24, boxShadow: "0 1px 4px rgba(0,0,0,.06)" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
         <div>
-          <div style={{ fontFamily: "Syne,sans-serif", fontWeight: 800, fontSize: 15, color: "#0a2e1a" }}>
-            📅 This Week's Summary
+          <div style={{ fontFamily: "Syne,sans-serif", fontWeight: 800, fontSize: 15, color: "#0a2e1a", display: "flex", alignItems: "center", gap: 8 }}>
+            <CalendarIcon size={18} color="var(--egi-green)" /> This Week's Summary
           </div>
           <div style={{ fontSize: 12, color: "#6b7280", marginTop: 2 }}>{weekLabel}</div>
         </div>
@@ -141,16 +150,16 @@ function WeeklySummary({ contents }) {
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
         {[
-          { label: "Planned",        value: planned,       bg: "#eff6ff", color: "#1d4ed8", border: "#bfdbfe", icon: "📋" },
-          { label: "Posted",         value: posted,        bg: "#dcfce7", color: "#166534", border: "#bbf7d0", icon: "✅" },
-          { label: "Reviewed", value: Review, bg: "#fef3c7", color: "#92400e", border: "#fde68a", icon: "⏳" },
-          { label: "Missed",         value: missed,        bg: "#fef2f2", color: "#dc2626", border: "#fecaca", icon: "❌" },
+          { label: "Planned",  value: planned, bg: "#eff6ff", color: "#1d4ed8", border: "#bfdbfe", icon: <ClipboardIcon size={24} color="#1d4ed8" /> },
+          { label: "Posted",   value: posted,  bg: "#dcfce7", color: "#166534", border: "#bbf7d0", icon: <CheckCircleIcon size={24} color="#166534" /> },
+          { label: "Reviewed", value: Review,  bg: "#fef3c7", color: "#92400e", border: "#fde68a", icon: <HourglassIcon size={24} color="#92400e" /> },
+          { label: "Missed",   value: missed,  bg: "#fef2f2", color: "#dc2626", border: "#fecaca", icon: <XCircleIcon size={24} color="#dc2626" /> },
         ].map(s => (
           <div key={s.label} style={{ background: s.bg, border: `1px solid ${s.border}`,
-            borderRadius: 12, padding: "14px 16px", textAlign: "center" }}>
-            <div style={{ fontSize: 22, marginBottom: 4 }}>{s.icon}</div>
-            <div style={{ fontSize: 26, fontWeight: 800, color: s.color }}>{s.value}</div>
-            <div style={{ fontSize: 11, color: s.color, fontWeight: 600, marginTop: 2, opacity: 0.85 }}>
+            borderRadius: 12, padding: "14px 16px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <div style={{ marginBottom: 6, display: "flex", alignItems: "center", justifyContent: "center" }}>{s.icon}</div>
+            <div style={{ fontSize: 26, fontWeight: 800, color: s.color, lineHeight: 1.1 }}>{s.value}</div>
+            <div style={{ fontSize: 11.5, color: s.color, fontWeight: 700, marginTop: 4, letterSpacing: "0.02em" }}>
               {s.label}
             </div>
           </div>

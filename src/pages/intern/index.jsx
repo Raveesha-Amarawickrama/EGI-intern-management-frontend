@@ -7,6 +7,12 @@ import TaskTimer from "../../components/shared/TaskTimer.jsx";
 import WeeklyHoursCard from "../../components/shared/WeeklyHoursCard.jsx";
 import { computeStats, formatMinutes, statusSelectClass, getWeekKey } from "../../utils/helpers";
 import { useAuth } from "../../hooks/useAuth";
+import {
+  CheckCircleIcon,
+  ClipboardIcon,
+  ClockIcon,
+  TrendingUpIcon,
+} from "../../components/shared/Icons.jsx";
 
 // ─── CSS injection for overdue/leave row hover states ─────────────────────────
 function OverdueRowStyles() {
@@ -426,24 +432,122 @@ const getWeekBounds = () => {
   return (
     <div className="animate-fadeUp">
       <OverdueRowStyles />
-      <div className="alert alert-warning mb-20">
+
+      {/* ── Top Greeting Banner ── */}
+      <div className="egi-greeting-banner">
+        <div className="egi-greeting-left">
+          <div className="egi-greeting-salutation">Good Morning,</div>
+          <div className="egi-greeting-name">
+            {user?.name || "Intern"}
+            <span style={{ fontSize: 22 }}>🍃</span>
+          </div>
+          <div className="egi-greeting-sub">
+            Here's an overview of your internship tasks and progress.
+          </div>
+          <div className="egi-quote-box">
+            "Great people build great things."
+          </div>
+        </div>
+        <div className="egi-greeting-right">
+          <div style={{
+            display: "flex", alignItems: "center", gap: 10,
+            background: "rgba(255,255,255,0.92)", backdropFilter: "blur(8px)",
+            padding: "8px 16px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.8)",
+            boxShadow: "0 4px 16px rgba(0,0,0,0.06)"
+          }}>
+            <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
+              <path d="M16 38C12 28 18 16 36 10C36 24 28 36 16 38Z" fill="#0f6240"/>
+              <path d="M16 38C9 30 9 22 14 17C20 20 20 28 16 38Z" fill="#16a34a"/>
+              <path d="M16 38C18 30 24 21 36 10" stroke="#a7f3d0" strokeWidth="1.6" strokeLinecap="round"/>
+            </svg>
+            <div style={{ lineHeight: 1.15 }}>
+              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11.5, fontWeight: 800, color: "#072a1d", letterSpacing: 0.8 }}>
+                ECO GREEN
+              </div>
+              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 8, color: "#0d593e", letterSpacing: 1.5 }}>
+                INTERNATIONAL
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="alert alert-warning mb-20" style={{ borderRadius: 12 }}>
         ⚡ The internship requires at least <strong>&nbsp;8 hours/day</strong>.
       </div>
-      <div className="grid-4 mb-24">
-        {[
-          ["✅", "Done", done, "stat-green", "up", "↑ Keep it up!"],
-          ["⚡", "In Progress", inProgress, "stat-blue", "neutral", "Active"],
-          ["⏸", "On Hold", hold, "stat-gold", "warn", "Needs action"],
-          ["🏖️", "Leave Days", leaveDays.length, "stat-red", "neutral", "Approved"],
-        ].map(([icon, label, val, cls, chg, chgTxt]) => (
-          <div key={label} className={`stat-card ${cls}`}>
-            <div className="stat-icon">{icon}</div>
-            <div className="stat-value">{val}</div>
-            <div className="stat-label">{label}</div>
-            <div className={`stat-change ${chg}`}>{chgTxt}</div>
+
+      {/* ── 4 Stat Cards ── */}
+      <div className="egi-stat-card-row">
+        <div className="egi-stat-card">
+          <div className="egi-stat-card-header">
+            <div className="egi-stat-icon-bubble" style={{ background: "#dcfce7", color: "#15803d" }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <span className="egi-stat-arrow">→</span>
           </div>
-        ))}
+          <div className="egi-stat-value">{done}</div>
+          <div className="egi-stat-title">Completed Tasks</div>
+          <div className="egi-stat-subtitle" style={{ color: "#16a34a", fontWeight: 700 }}>↑ Keep it up!</div>
+          <svg className="egi-stat-wave-bg" viewBox="0 0 100 100" fill="#22c55e">
+            <path d="M0 100 Q 35 50 65 75 T 100 30 L 100 100 Z" />
+          </svg>
+        </div>
+
+        <div className="egi-stat-card">
+          <div className="egi-stat-card-header">
+            <div className="egi-stat-icon-bubble" style={{ background: "#dbeafe", color: "#2563eb" }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+              </svg>
+            </div>
+            <span className="egi-stat-arrow">→</span>
+          </div>
+          <div className="egi-stat-value">{inProgress}</div>
+          <div className="egi-stat-title">In Progress</div>
+          <div className="egi-stat-subtitle">Active tasks</div>
+          <svg className="egi-stat-wave-bg" viewBox="0 0 100 100" fill="#3b82f6">
+            <path d="M0 100 Q 45 60 75 80 T 100 35 L 100 100 Z" />
+          </svg>
+        </div>
+
+        <div className="egi-stat-card">
+          <div className="egi-stat-card-header">
+            <div className="egi-stat-icon-bubble" style={{ background: "#fef3c7", color: "#b45309" }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="6" y="4" width="4" height="16"/>
+                <rect x="14" y="4" width="4" height="16"/>
+              </svg>
+            </div>
+            <span className="egi-stat-arrow">→</span>
+          </div>
+          <div className="egi-stat-value">{hold}</div>
+          <div className="egi-stat-title">On Hold</div>
+          <div className="egi-stat-subtitle" style={{ color: "#b45309" }}>Needs action</div>
+          <svg className="egi-stat-wave-bg" viewBox="0 0 100 100" fill="#f59e0b">
+            <path d="M0 100 Q 30 55 60 70 T 100 40 L 100 100 Z" />
+          </svg>
+        </div>
+
+        <div className="egi-stat-card">
+          <div className="egi-stat-card-header">
+            <div className="egi-stat-icon-bubble" style={{ background: "#fee2e2", color: "#dc2626" }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+            </div>
+            <span className="egi-stat-arrow">→</span>
+          </div>
+          <div className="egi-stat-value">{leaveDays.length}</div>
+          <div className="egi-stat-title">Leave Days</div>
+          <div className="egi-stat-subtitle">Approved</div>
+          <svg className="egi-stat-wave-bg" viewBox="0 0 100 100" fill="#ef4444">
+            <path d="M0 100 Q 40 60 70 80 T 100 20 L 100 100 Z" />
+          </svg>
+        </div>
       </div>
+
       <div className="grid-2 mb-24">
         <WeeklyHoursCard tasks={thisWeekTasks} noTarget />
       </div>
@@ -509,7 +613,9 @@ const getWeekBounds = () => {
 // ─── MyTasksPage (Intern) ─────────────────────────────────────────────────────
 export function MyTasksPage() {
   const { user } = useAuth();
-  const [allTasks, setAllTasks] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -532,27 +638,28 @@ export function MyTasksPage() {
     if (!user) return;
     setLoading(true);
     const myId = String(user._id || user.id || "");
-    const params = { internId: myId };
+    const params = {
+      internId: myId,
+      page,
+      limit: PAGE_SIZE,
+    };
     if (status !== "All") params.status = status;
     if (search) params.search = search;
+    if (filterMode === "date" && filterDate) params.date = filterDate;
+    if (filterMode === "week" && filterWeek) params.weekKey = filterWeek;
 
     taskAPI.getAll(params)
       .then(d => {
-        const mine = (d.tasks || []).filter(
-          t => String(t.assignedTo?._id || t.assignedTo) === myId
-        );
-        setAllTasks(mine);
+        setTasks(d.tasks || []);
+        setTotalPages(d.totalPages || 1);
+        setTotalRecords(d.total !== undefined ? d.total : (d.tasks || []).length);
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [status, search, user]);
+  }, [status, search, user, page, filterMode, filterDate, filterWeek]);
 
   useEffect(() => { load(); }, [load]);
   useEffect(() => { setPage(1); }, [filterMode, filterDate, filterWeek, status, search]);
-
-  const filteredTasks = applyDateFilter(allTasks, filterMode, filterDate, filterWeek);
-  const totalPages = Math.ceil(filteredTasks.length / PAGE_SIZE);
-  const tasks = filteredTasks.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const handleSave = async (form) => {
     if (!user) return;
@@ -560,11 +667,10 @@ export function MyTasksPage() {
     try {
       if (editTask) {
         const d = await taskAPI.update(editTask._id || editTask.id, form);
-        setAllTasks(ts => ts.map(t => (t._id || t.id) === (editTask._id || editTask.id) ? d.task : t));
+        setTasks(ts => ts.map(t => (t._id || t.id) === (editTask._id || editTask.id) ? d.task : t));
         setToast({ msg: "Task updated!", type: "success" });
       } else {
-        const d = await taskAPI.create({ ...form, assignedTo: user._id });
-        setAllTasks(ts => [d.task, ...ts]);
+        await taskAPI.create({ ...form, assignedTo: user._id });
         setToast({ msg: "Task created!", type: "success" });
         if (form.isLeave && weekendDates.length > 0) {
           await Promise.all(
@@ -574,8 +680,8 @@ export function MyTasksPage() {
           );
           setToast({ msg: `Leave + ${weekendDates.length} weekend day(s) saved!`, type: "success" });
           setWeekendDates([]);
-          load();
         }
+        load();
       }
       setShowModal(false); setEditTask(null);
     } catch (e) { setToast({ msg: e.message, type: "error" }); }
@@ -583,10 +689,10 @@ export function MyTasksPage() {
   };
 
   const handleStatus = async (id, newStatus) => {
-    setAllTasks(prev => prev.map(t => (t._id || t.id) === id ? { ...t, status: newStatus } : t));
+    setTasks(prev => prev.map(t => (t._id || t.id) === id ? { ...t, status: newStatus } : t));
     try {
       const d = await taskAPI.updateStatus(id, newStatus);
-      setAllTasks(prev => prev.map(t => (t._id || t.id) === id ? d.task : t));
+      setTasks(prev => prev.map(t => (t._id || t.id) === id ? d.task : t));
     } catch (e) {
       setToast({ msg: e.message, type: "error" });
       load();
@@ -595,10 +701,10 @@ export function MyTasksPage() {
 
   const handleWorkTimeChange = async (id, minutes) => {
     const mins = typeof minutes === "number" ? minutes : (parseInt(minutes) || 0);
-    setAllTasks(prev => prev.map(t => (t._id || t.id) === id ? { ...t, totalMinutes: mins } : t));
+    setTasks(prev => prev.map(t => (t._id || t.id) === id ? { ...t, totalMinutes: mins } : t));
     try {
       const d = await taskAPI.update(id, { totalMinutes: mins });
-      setAllTasks(prev => prev.map(t => (t._id || t.id) === id ? d.task : t));
+      setTasks(prev => prev.map(t => (t._id || t.id) === id ? d.task : t));
     } catch (e) {
       setToast({ msg: e.message, type: "error" });
       load();
@@ -606,12 +712,10 @@ export function MyTasksPage() {
   };
 
   const handleTaskUpdated = (updated) => {
-    setAllTasks(ts => ts.map(t => (t._id || t.id) === (updated._id || updated.id) ? updated : t));
+    setTasks(ts => ts.map(t => (t._id || t.id) === (updated._id || updated.id) ? updated : t));
   };
 
-  
-
-  const leaveDays = allTasks.filter(t => t.isLeave).length;
+  const leaveDays = tasks.filter(t => t.isLeave).length;
 
   if (!user) return <div style={{ padding: 60, textAlign: "center" }}><div className="spinner" /></div>;
 
@@ -634,11 +738,11 @@ export function MyTasksPage() {
 
       <div className="card">
         <div className="card-header">
-          <div className="card-title">
-            📋 My Tasks
+          <div className="card-title" style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+            <ClipboardIcon size={18} color="var(--egi-green)" /> My Tasks
             {leaveDays > 0 && (
-              <span style={{ marginLeft: 10, fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 99, background: "#fef3c7", color: "#92400e", border: "1px solid #fde68a" }}>
-                🌴 {leaveDays} leave day{leaveDays > 1 ? "s" : ""}
+              <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 99, background: "#fef3c7", color: "#92400e", border: "1px solid #fde68a" }}>
+                {leaveDays} leave day{leaveDays > 1 ? "s" : ""}
               </span>
             )}
           </div>
@@ -659,7 +763,7 @@ export function MyTasksPage() {
               filterDate={filterDate} setFilterDate={setFilterDate}
               filterWeek={filterWeek} setFilterWeek={setFilterWeek}
               weekOptions={weekOptions} />
-            <span className="text-sm text-gray" style={{ marginLeft: "auto" }}>{filteredTasks.length} records</span>
+            <span className="text-sm text-gray" style={{ marginLeft: "auto" }}>{totalRecords} records</span>
           </div>
         </div>
 
@@ -786,10 +890,10 @@ export function ProfilePage() {
       {stats && (
         <div className="grid-4">
           {[
-            ["✅", "Completed", stats.done, "stat-green"],
-            ["📋", "Total Tasks", stats.total, "stat-blue"],
-            ["⏱", "Hours Logged", formatMinutes(stats.totalMins), "stat-gold"],
-            ["📈", "Completion", stats.pct + "%", "stat-purple"],
+            [<CheckCircleIcon size={22} color="#166534" />, "Completed", stats.done, "stat-green"],
+            [<ClipboardIcon size={22} color="#1d4ed8" />, "Total Tasks", stats.total, "stat-blue"],
+            [<ClockIcon size={22} color="#b45309" />, "Hours Logged", formatMinutes(stats.totalMins), "stat-gold"],
+            [<TrendingUpIcon size={22} color="#7c3aed" />, "Completion", stats.pct + "%", "stat-purple"],
           ].map(([icon, label, val, cls]) => (
             <div key={label} className={`stat-card ${cls}`}>
               <div className="stat-icon">{icon}</div>

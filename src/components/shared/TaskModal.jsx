@@ -80,8 +80,6 @@ export default function TaskModal({ task, currentUser = {}, onClose, onSave, loa
         <div className="modal-header">
           <div>
             <div className="modal-title">
-              {isLeaveMode ? "" : (task ? "✏️" : "➕")}
-              {" "}
               {isLeaveMode ? "Mark Leave Day" : (task ? "Edit Task" : "Create New Task")}
             </div>
             <p className="text-sm text-gray" style={{ marginTop: 3 }}>
@@ -105,7 +103,7 @@ export default function TaskModal({ task, currentUser = {}, onClose, onSave, loa
                   color: !isLeaveMode ? "#fff" : "#6b7280", transition: "all .15s",
                 }}
               >
-                {isSupervisor ? "📋 Assign Task" : "📋 New Task"}
+                {isSupervisor ? "Assign Task" : "New Task"}
               </button>
               <button
                 onClick={() => !isLeaveMode && toggleLeave()}

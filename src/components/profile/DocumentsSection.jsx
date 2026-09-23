@@ -11,11 +11,12 @@
 
 import { useRef, useState } from "react";
 import { userAPI } from "../../utils/api.js";
+import { FileTextIcon, ClipboardIcon, FolderIcon } from "../shared/Icons.jsx";
 
 const DOC_META = {
-  cv:             { label: "Curriculum Vitae (CV)",         icon: "📄", accept: ".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp" },
-  policeReport:   { label: "Police Report",                 icon: "🚔", accept: ".pdf,.jpg,.jpeg,.png,.webp" },
-  gramaNiladhari: { label: "Grama Niladhari Report",        icon: "📋", accept: ".pdf,.jpg,.jpeg,.png,.webp" },
+  cv:             { label: "Curriculum Vitae (CV)",         icon: <FileTextIcon size={22} color="#059669" />, accept: ".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp" },
+  policeReport:   { label: "Police Report",                 icon: <FileTextIcon size={22} color="#2563eb" />, accept: ".pdf,.jpg,.jpeg,.png,.webp" },
+  gramaNiladhari: { label: "Grama Niladhari Report",        icon: <ClipboardIcon size={22} color="#b45309" />, accept: ".pdf,.jpg,.jpeg,.png,.webp" },
 };
 
 function DocCard({ docType, docData, userId, onUpdated, setToast }) {
@@ -121,7 +122,7 @@ function DocCard({ docType, docData, userId, onUpdated, setToast }) {
               textDecoration: "none",
             }}
           >
-            👁 View
+            View
           </a>
         )}
 
@@ -137,7 +138,7 @@ function DocCard({ docType, docData, userId, onUpdated, setToast }) {
             opacity: busy ? 0.6 : 1,
           }}
         >
-          {busy ? "⏳ Processing…" : uploaded ? "🔄 Replace" : "⬆ Upload"}
+          {busy ? "Processing…" : uploaded ? "Replace" : "Upload"}
         </button>
 
         {uploaded && (
@@ -154,7 +155,7 @@ function DocCard({ docType, docData, userId, onUpdated, setToast }) {
               opacity: busy ? 0.6 : 1,
             }}
           >
-            🗑 Remove
+            Remove
           </button>
         )}
       </div>
@@ -169,7 +170,9 @@ export default function DocumentsSection({ user, onUpdated, setToast }) {
   return (
     <div className="card mb-24">
       <div className="card-header">
-        <div className="card-title">📁 Employee Documents</div>
+        <div className="card-title" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <FolderIcon size={18} color="var(--egi-green)" /> Employee Documents
+        </div>
         <div style={{ fontSize: 12, color: "var(--gray-500, #94a3b8)" }}>
           Upload CV, Police Report &amp; Grama Niladhari Report
         </div>

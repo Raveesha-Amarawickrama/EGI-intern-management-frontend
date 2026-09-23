@@ -149,17 +149,17 @@ export default function SupervisorSchedulePage() {
             </div>
 
             <div style={{ display:'flex', flexDirection:'column', gap:10, fontSize:13, color:'#374151' }}>
-              <div><span style={{ fontWeight:600, color:'#6b7280' }}>📅 Date: </span>{formatDate(detail.date)}</div>
-              <div><span style={{ fontWeight:600, color:'#6b7280' }}>⏰ Time: </span>{detail.startTime} – {detail.endTime}</div>
-              <div><span style={{ fontWeight:600, color:'#6b7280' }}>📍 Location: </span>{detail.location || 'Online'}</div>
+              <div><span style={{ fontWeight:600, color:'#6b7280' }}>Date: </span>{formatDate(detail.date)}</div>
+              <div><span style={{ fontWeight:600, color:'#6b7280' }}>Time: </span>{detail.startTime} – {detail.endTime}</div>
+              <div><span style={{ fontWeight:600, color:'#6b7280' }}>Location: </span>{detail.location || 'Online'}</div>
               {detail.meetingLink && (
-                <div><span style={{ fontWeight:600, color:'#6b7280' }}>🔗 Link: </span>
+                <div><span style={{ fontWeight:600, color:'#6b7280' }}>Link: </span>
                   <a href={detail.meetingLink} target="_blank" rel="noreferrer" style={{ color:'#1D9E75' }}>{detail.meetingLink}</a>
                 </div>
               )}
-              {detail.description && <div><span style={{ fontWeight:600, color:'#6b7280' }}>📝 Agenda: </span>{detail.description}</div>}
+              {detail.description && <div><span style={{ fontWeight:600, color:'#6b7280' }}>Agenda: </span>{detail.description}</div>}
               {detail.participants?.length > 0 && (
-                <div><span style={{ fontWeight:600, color:'#6b7280' }}>👥 Participants: </span>
+                <div><span style={{ fontWeight:600, color:'#6b7280' }}>Participants: </span>
                   {detail.participants.map(p => p.name || p).join(', ')}
                 </div>
               )}
@@ -168,11 +168,11 @@ export default function SupervisorSchedulePage() {
             <div style={{ display:'flex', gap:8, justifyContent:'flex-end', marginTop:20 }}>
               <button onClick={() => handleDelete(detail._id)}
                 style={{ padding:'8px 16px', borderRadius:8, border:'1px solid #fecaca', background:'#fff5f5', color:'#991b1b', cursor:'pointer', fontSize:13, fontFamily:'inherit' }}>
-                🗑 Delete
+                Delete
               </button>
               <button onClick={() => { setEditMeeting(detail); setDetail(null); setShowModal(true); }}
                 style={{ padding:'8px 16px', borderRadius:8, border:'1px solid #e5e7eb', background:'#f9fafb', cursor:'pointer', fontSize:13, fontFamily:'inherit' }}>
-                ✏️ Edit
+                Edit
               </button>
               <button onClick={() => setDetail(null)}
                 style={{ padding:'8px 20px', borderRadius:8, border:'none', background:'#1a2f1e', color:'#fff', cursor:'pointer', fontSize:13, fontWeight:600, fontFamily:'inherit' }}>
@@ -226,7 +226,7 @@ export default function SupervisorSchedulePage() {
 
         <div>
           <div className="card" style={{ marginBottom:16 }}>
-            <div className="card-header"><div className="card-title">📅 Upcoming</div></div>
+            <div className="card-header"><div className="card-title">Upcoming (7 days)</div></div>
             {upcoming.length === 0 ? (
               <div style={{ padding:'16px 20px', color:'#9ca3af', fontSize:13 }}>None in next 7 days.</div>
             ) : upcoming.map(m => {

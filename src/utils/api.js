@@ -36,7 +36,7 @@ export const authAPI = {
 export const taskAPI = {
   getAll: (params = {}) => {
     const qs = new URLSearchParams(
-      Object.fromEntries(Object.entries(params).filter(([, v]) => v && v !== "All"))
+      Object.fromEntries(Object.entries(params).filter(([, v]) => v !== undefined && v !== null && v !== "" && v !== "All"))
     ).toString();
     return request(`/tasks${qs ? "?" + qs : ""}`);
   },
@@ -105,10 +105,15 @@ export const projectAPI = {
 };
 
 export const reportAPI = {
-  summary:  () => request("/reports/summary"),
-  interns:  () => request("/reports/interns"),
-  projects: () => request("/reports/projects"),
-   supervisors: () => request("/reports/supervisors"),
+  summary:     () => request("/reports/summary"),
+  interns:     (params = {}) => {
+    const qs = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).filter(([, v]) => v !== undefined && v !== null && v !== "" && v !== "All"))
+    ).toString();
+    return request(`/reports/interns${qs ? "?" + qs : ""}`);
+  },
+  projects:    () => request("/reports/projects"),
+  supervisors: () => request("/reports/supervisors"),
 };
 
 export const messageAPI = {

@@ -3,6 +3,13 @@ import { createPortal } from "react-dom";
 import { thirdPartyItemAPI } from "../../utils/api";
 import { Toast } from "../../components/shared/index.jsx";
 import { useAuth } from "../../hooks/useAuth";
+import {
+  BellIcon,
+  CheckCircleIcon,
+  TrashIcon,
+  RefreshIcon,
+  CalendarIcon,
+} from "../../components/shared/Icons.jsx";
 
 function Modal({ children, onBgClick }) {
   return createPortal(
@@ -306,7 +313,9 @@ export default function ThirdPartyItemsPage() {
       {deleteTarget && (
         <Modal onBgClick={() => setDeleteTarget(null)}>
           <div style={{ width: 360 }}>
-            <div style={{ fontFamily: "Syne,sans-serif", fontWeight: 800, fontSize: 18, color: "#dc2626", marginBottom: 6 }}>🗑 Remove Item</div>
+            <div style={{ fontFamily: "Syne,sans-serif", fontWeight: 800, fontSize: 18, color: "#dc2626", marginBottom: 6, display: "flex", alignItems: "center", gap: 8 }}>
+              <TrashIcon size={20} color="#dc2626" /> Remove Item
+            </div>
             <p style={{ fontSize: 13, color: "#6b7280", marginBottom: 20 }}>Remove <strong>{deleteTarget.name}</strong>? This cannot be undone.</p>
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
               <button className="btn btn-secondary" onClick={() => setDeleteTarget(null)}>Cancel</button>
@@ -320,7 +329,9 @@ export default function ThirdPartyItemsPage() {
       {renewTarget && (
         <Modal onBgClick={() => setRenewTarget(null)}>
           <div style={{ width: 380 }}>
-            <div style={{ fontFamily: "Syne,sans-serif", fontWeight: 800, fontSize: 18, color: "#166534", marginBottom: 6 }}>✅ Mark as Renewed</div>
+            <div style={{ fontFamily: "Syne,sans-serif", fontWeight: 800, fontSize: 18, color: "#166534", marginBottom: 6, display: "flex", alignItems: "center", gap: 8 }}>
+              <CheckCircleIcon size={20} color="#166534" /> Mark as Renewed
+            </div>
             <p style={{ fontSize: 13, color: "#6b7280", marginBottom: 8 }}>
               Confirm that <strong>{renewTarget.name}</strong> has been renewed.
             </p>
@@ -346,9 +357,11 @@ export default function ThirdPartyItemsPage() {
       <div className="card">
         <div className="card-header">
           <div>
-            <div className="card-title">🔔 Third-Party Renewals</div>
+            <div className="card-title" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <BellIcon size={18} color="var(--egi-green)" /> Third-Party Renewals
+            </div>
             <div style={{ fontSize: 11.5, color: "var(--gray-400)", marginTop: 2 }}>
-              📧 Email reminders sent automatically 3 days before each renewal date
+              Automatic email reminders sent 3 days before renewal dates
             </div>
           </div>
           <div style={{ display: "flex", gap: 10 }}>
@@ -359,10 +372,12 @@ export default function ThirdPartyItemsPage() {
                 fontSize: 11.5, fontWeight: 600, padding: "8px 14px", borderRadius: 8,
                 border: "1px solid #bbf7d0", background: "#f0fdf4", color: "#166534",
                 cursor: checkingNow ? "default" : "pointer", fontFamily: "inherit",
+                display: "inline-flex", alignItems: "center", gap: 6,
               }}
               title="Manually run the renewal check and send any pending emails now"
             >
-              {checkingNow ? "⏳ Checking…" : "🔄 Check & Send Reminders Now"}
+              <RefreshIcon size={13} color="#166534" />
+              {checkingNow ? "Checking…" : "Check & Send Reminders Now"}
             </button>
             <button className="btn btn-primary" onClick={openAdd}>+ Add Renewal Item</button>
           </div>
